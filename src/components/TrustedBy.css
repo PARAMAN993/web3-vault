@@ -1,0 +1,177 @@
+/* =========================
+   TRUSTED BY SECTION
+========================= */
+
+.trusted {
+  position: relative;
+  padding: 110px 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at left, rgba(16,185,129,0.08), transparent 30%),
+    radial-gradient(circle at right, rgba(59,130,246,0.08), transparent 30%);
+}
+
+/* TITLE */
+.trusted-title {
+  text-align: center;
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 55px;
+  letter-spacing: -1px;
+}
+
+/* =========================
+   MARQUEE WRAPPER
+========================= */
+
+.marquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+/* fade edges */
+.marquee::before,
+.marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 180px;
+  height: 20%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.marquee::before {
+  left: 0;
+  background: linear-gradient(to right, #000, transparent);
+}
+
+.marquee::after {
+  right: 0;
+  background: linear-gradient(to left, #000, transparent);
+}
+
+/* =========================
+   TRACK
+========================= */
+
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+
+  width: max-content;
+
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* RIGHT MOVEMENT */
+.marquee-track.right {
+  animation: scrollRight 28s linear infinite;
+}
+
+/* LEFT MOVEMENT */
+.marquee-track.left {
+  animation: scrollLeft 28s linear infinite;
+}
+
+/* =========================
+   LOGO CARDS
+========================= */
+
+.marquee-track img {
+  width: 170px;
+  height: 85px;
+
+  object-fit: contain;
+
+  padding: 20px;
+
+  border-radius: 22px;
+
+  background: linear-gradient(145deg, #071427, #08111f);
+
+  border: 1px solid rgba(255,255,255,0.05);
+
+  transition: all 0.35s ease;
+
+  opacity: 0.9;
+}
+
+/* HOVER */
+.marquee-track img:hover {
+  transform: translateY(-6px);
+
+  border-color: rgba(59,130,246,0.4);
+
+  box-shadow:
+    0 0 30px rgba(59,130,246,0.12),
+    inset 0 0 20px rgba(255,255,255,0.03);
+
+  opacity: 1;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes scrollRight {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scrollLeft {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+  .trusted {
+    padding: 80px 0;
+  }
+
+  .trusted-title {
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+
+  .marquee {
+    margin-bottom: 22px;
+  }
+
+  .marquee::before,
+  .marquee::after {
+    width: 70px;
+  }
+
+  .marquee-track {
+    gap: 18px;
+  }
+
+  .marquee-track img {
+    width: 130px;
+    height: 70px;
+
+    padding: 16px;
+
+    border-radius: 18px;
+  }
+}

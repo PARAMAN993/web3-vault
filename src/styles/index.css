@@ -1,0 +1,262 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ROOT */
+body {
+  font-family: "Inter", sans-serif;
+  background: #000; /* PURE BLACK BASE */
+  color: #fff; /* FIXES BLACK TEXT ISSUE */
+  overflow-x: hidden;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* STAR BACKGROUND */
+body::before {
+  content: "";
+  position: fixed;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(white 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.08;
+  animation: starsMove 60s linear infinite;
+  z-index: -2;
+}
+
+@keyframes starsMove {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-500px);
+  }
+}
+
+/* GLOW ORBS (like reference site) */
+body::after {
+  content: "";
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #3b82f6, transparent);
+  top: 20%;
+  right: -150px;
+  opacity: 0.2;
+  filter: blur(120px);
+  z-index: -1;
+}
+
+/* =========================
+   GLOBAL SPACING SYSTEM
+========================= */
+section {
+  padding: 80px 20px;
+}
+
+@media (max-width: 768px) {
+  section {
+    padding: 60px 15px;
+  }
+}
+
+/* =========================
+   TYPOGRAPHY
+========================= */
+
+h1, h2, h3, h4, h5, h6 {
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+p {
+  color: #aaa;
+  line-height: 1.6;
+}
+
+/* =========================
+   BUTTONS (UNIFIED)
+========================= */
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #9333ea);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 12px;
+  transition: 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(59,130,246,0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 12px;
+}
+
+.btn-cancel {
+  background: #ec4899;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+}
+
+.btn-proceed {
+  background: #3b82f6;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+}
+
+/* =========================
+   INPUTS (GLOBAL FIX)
+========================= */
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: #1e293b;
+  color: #fff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #777;
+}
+
+
+
+
+
+/*=== STATISTICS ===*/
+.stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  padding: 80px 20px;
+}
+
+.stat {
+  text-align: center;
+  position: relative;
+  padding: 0 30px;
+}
+
+/* vertical divider */
+.stat:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 10%;
+  height: 80%;
+  width: 2px;
+  background: rgba(255,255,255,0.1);
+}
+
+/* number */
+.stat h3 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #3b82f6, #22c55e);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* label */
+.stat p {
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+/* hover glow */
+.stat:hover {
+  transform: translateY(-5px);
+  transition: 0.3s;
+}
+
+.stat:hover h3 {
+  text-shadow: 0 0 12px rgba(59,130,246,0.6);
+}
+
+/*== MOBILE FIX FOR STATS ==*/
+@media (max-width: 768px) {
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 per row */
+    gap: 30px 20px;
+    padding: 60px 20px;
+  }
+
+  .stat {
+    padding: 0;
+  }
+
+  /* remove divider lines */
+  .stat::after {
+    display: none;
+  }
+
+  .stat h3 {
+    font-size: 22px;
+  }
+
+  .stat p {
+    font-size: 13px;
+  }
+}
+
+
+
+/* =========================
+   🔧 BACKGROUND FIX
+========================= */
+.app {
+  min-height: 100vh;
+  background: #000; /* PURE BLACK */
+  position: relative;
+}
+
+/* optional subtle gradient like reference */
+.app::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(59,130,246,0.08), transparent 40%);
+  pointer-events: none;
+}
+  

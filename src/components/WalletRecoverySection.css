@@ -1,0 +1,182 @@
+.recovery-section {
+  position: relative;
+  padding: 100px 70px;
+  background:
+    linear-gradient(
+      90deg,
+      #081321 0%,
+      #04111d 45%,
+      #0b2b2b 100%
+    );
+  overflow: hidden;
+}
+
+/* DESKTOP LAYOUT */
+.recovery-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+
+  position: relative;
+  z-index: 3;
+}
+
+/* IMAGE */
+.recovery-image-wrapper {
+  flex: 1;
+}
+
+.recovery-image {
+  width: 100%;
+  max-width: 560px;
+  display: block;
+}
+
+/* CARD */
+.recovery-card {
+  flex: 1;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(6, 25, 48, 0.96),
+      rgba(3, 16, 30, 0.96)
+    );
+
+  border-radius: 28px;
+
+  padding: 50px;
+
+  border: 1px solid rgba(255,255,255,0.05);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.35);
+}
+
+.recovery-card h2 {
+  color: white;
+  font-size: 40px;
+  line-height: 1.05;
+  margin-bottom: 30px;
+  font-weight: 800;
+}
+
+.recovery-card h3 {
+  color: white;
+  font-size: 20px;
+  margin-bottom: 24px;
+  font-weight: 800;
+}
+
+.recovery-card p {
+  color: rgba(255,255,255,0.8);
+  font-size: 20px;
+  line-height: 1.9;
+  margin-bottom: 22px;
+}
+
+/* BUTTON */
+.recovery-card button {
+  margin-top: 18px;
+
+  width: 230px;
+  height: 65px;
+
+  border-radius: 50px;
+
+  border: 2px solid #3b82f6;
+
+  background: transparent;
+
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.recovery-card button:hover {
+  background: #3b82f6;
+  transform: translateY(-3px);
+}
+
+/* DECOR */
+.recovery-planet {
+  position: absolute;
+  top: 60px;
+  right: 50px;
+  width: 140px;
+  opacity: 0.9;
+  z-index: 2;
+}
+
+.recovery-bitcoin {
+  position: absolute;
+  bottom: 30px;
+  left: 20px;
+  width: 110px;
+  opacity: 0.9;
+  z-index: 2;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .recovery-section {
+    padding: 0 0 90px;
+  }
+
+  .recovery-content {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .recovery-image-wrapper {
+    width: 100%;
+  }
+
+  .recovery-image {
+    width: 100%;
+    max-width: 100%;
+    height: 320px;
+    object-fit: cover;
+  }
+
+  .recovery-card {
+    width: 92%;
+    margin-top: -35px;
+
+    padding: 35px 24px;
+
+    border-radius: 24px;
+  }
+
+  .recovery-card h2 {
+    font-size: 34px;
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+
+  .recovery-card h3 {
+    font-size: 30px;
+    margin-bottom: 18px;
+  }
+
+  .recovery-card p {
+    font-size: 18px;
+    line-height: 1.8;
+  }
+
+  .recovery-card button {
+    width: 100%;
+    height: 60px;
+  }
+
+  /* remove decor on mobile */
+  .recovery-bitcoin,
+  .recovery-planet {
+    display: none;
+  }
+}

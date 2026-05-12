@@ -1,0 +1,265 @@
+/* src/pages/LedgerLogin.css */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.ledger-auth-page {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    radial-gradient(circle at top left,
+      rgba(0, 102, 255, 0.14),
+      transparent 30%),
+    radial-gradient(circle at bottom right,
+      rgba(255, 0, 170, 0.12),
+      transparent 30%),
+    #050816;
+
+  overflow: hidden;
+  position: relative;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+
+  padding: 40px 32px;
+
+  border-radius: 28px;
+
+  background: rgba(255,255,255,0.05);
+
+  backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.45);
+
+  animation: fadeSlide 0.7s ease;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ICON */
+
+.auth-icon {
+  width: 72px;
+  height: 72px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #3399ff,
+      #005eff
+    );
+
+  color: white;
+}
+
+/* TITLE */
+
+.auth-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+}
+
+.safe {
+  color: #ffd700;
+}
+
+.web3 {
+  color: #3399ff;
+}
+
+.vaults {
+  color: #ff4fd8;
+}
+
+.auth-subtitle {
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+
+  margin-top: 10px;
+  margin-bottom: 28px;
+
+  font-size: 0.96rem;
+}
+
+/* FORM */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  color: white;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.input-group input {
+  height: 56px;
+
+  border-radius: 14px;
+
+  border: 1px solid
+    rgba(255,255,255,0.1);
+
+  background:
+    rgba(255,255,255,0.06);
+
+  padding: 0 18px;
+
+  color: white;
+  font-size: 0.95rem;
+
+  outline: none;
+
+  transition: 0.3s ease;
+}
+
+.input-group input::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+.input-group input:focus {
+  border-color: #3399ff;
+  box-shadow:
+    0 0 0 4px
+    rgba(51,153,255,0.15);
+}
+
+/* OPTIONS */
+
+.auth-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: rgba(255,255,255,0.75);
+  font-size: 0.9rem;
+}
+
+.forgot-password {
+  background: transparent;
+  border: none;
+
+  color: #3399ff;
+
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* BUTTON */
+
+.auth-button {
+  height: 56px;
+
+  border: none;
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #3399ff,
+      #005eff
+    );
+
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+.auth-button:hover {
+  transform: translateY(-2px);
+}
+
+/* FOOTER */
+
+.switch-auth {
+  text-align: center;
+
+  margin-top: 22px;
+
+  color:
+    rgba(255,255,255,0.7);
+}
+
+.switch-auth a {
+  color: #3399ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.secure-footer {
+  text-align: center;
+
+  margin-top: 18px;
+
+  color:
+    rgba(255,255,255,0.5);
+
+  font-size: 0.9rem;
+}
+
+/* MOBILE */
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 30px 22px;
+  }
+
+  .auth-title {
+    font-size: 1.55rem;
+  }
+}

@@ -1,0 +1,87 @@
+.dashboard-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(0, 153, 255, 0.15),
+      transparent 30%
+    ),
+    #050816;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.dashboard-card {
+  width: 100%;
+  max-width: 600px;
+
+  background: rgba(18, 24, 38, 0.88);
+  border: 1px solid
+    rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(20px);
+
+  border-radius: 28px;
+
+  padding: 50px 35px;
+
+  text-align: center;
+
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,0.45);
+}
+
+.dashboard-card h1 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  line-height: 1.4;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-card h1 span {
+  color: #4da6ff;
+
+  font-size: 1.8rem;
+  font-weight: 700;
+
+  word-break: break-word;
+  overflow-wrap: break-word;
+
+  max-width: 100%;
+  text-align: center;
+}
+
+.dashboard-card p {
+  color: #aeb6c7;
+  margin-bottom: 30px;
+  line-height: 1.7;
+}
+
+.dashboard-btn {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+
+  padding: 16px;
+
+  background: linear-gradient(
+    90deg,
+    #2563eb,
+    #4f8cff
+  );
+
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}

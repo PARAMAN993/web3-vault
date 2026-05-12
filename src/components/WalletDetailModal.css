@@ -1,0 +1,234 @@
+/* =========================
+   OVERLAY
+========================= */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  z-index: 9999;
+
+  animation: fadeIn 0.25s ease;
+}
+
+/* =========================
+   MODAL
+========================= */
+.sheet-modal {
+  width: 100%;
+  max-width: 460px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7,16,32,0.98),
+      rgba(2,6,23,0.98)
+    );
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  border-radius: 28px;
+
+  overflow: hidden;
+
+  position: relative;
+
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.55),
+    0 0 40px rgba(59,130,246,0.08);
+
+  animation: modalPop 0.28s ease;
+}
+
+/* =========================
+   HANDLE
+========================= */
+.sheet-handle {
+  width: 70px;
+  height: 5px;
+
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.12);
+
+  margin: 16px auto 8px;
+}
+
+/* =========================
+   HEADER
+========================= */
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px 24px;
+
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sheet-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+}
+
+.sheet-header svg {
+  font-size: 18px;
+  color: rgba(255,255,255,0.6);
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.sheet-header svg:hover {
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* =========================
+   BODY
+========================= */
+.sheet-body {
+  padding: 35px 28px 32px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+/* WALLET LOGO */
+.sheet-logo {
+  width: 95px;
+  height: 95px;
+
+  object-fit: contain;
+
+  margin-bottom: 24px;
+
+  border-radius: 22px;
+
+  padding: 14px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* DESCRIPTION */
+.sheet-body p {
+  color: rgba(255,255,255,0.72);
+
+  line-height: 1.8;
+
+  font-size: 15px;
+
+  margin-bottom: 30px;
+
+  max-width: 340px;
+}
+
+/* BUTTON */
+.btn-primary.full {
+  width: 100%;
+
+  height: 56px;
+
+  border: none;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    135deg,
+    #3b82f6,
+    #2563eb
+  );
+
+  color: white;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+.btn-primary.full:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(59,130,246,0.35);
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+
+  .sheet-modal {
+    border-radius: 24px;
+  }
+
+  .sheet-header {
+    padding: 16px 20px;
+  }
+
+  .sheet-header h3 {
+    font-size: 21px;
+  }
+
+  .sheet-body {
+    padding: 28px 22px 26px;
+  }
+
+  .sheet-logo {
+    width: 82px;
+    height: 82px;
+  }
+
+  .sheet-body p {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .btn-primary.full {
+    height: 52px;
+    font-size: 15px;
+  }
+}
