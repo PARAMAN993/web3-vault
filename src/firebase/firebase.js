@@ -12,14 +12,10 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// === DEBUG LOGS ===
 console.log("🔥 Firebase Config Loaded:");
-console.log("MODE:", import.meta.env.MODE);
-console.log("VITE_FIREBASE_API_KEY:", firebaseConfig.apiKey ? "✅ Present" : "❌ MISSING");
-console.log("VITE_FIREBASE_PROJECT_ID:", firebaseConfig.projectId);
-console.table(firebaseConfig);
+console.log("API Key starts with:", firebaseConfig.apiKey?.substring(0, 10) + "...");
+console.log("Full API Key length:", firebaseConfig.apiKey?.length);
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
