@@ -113,10 +113,12 @@ const handleSubmit = async () => {
     await new Promise(r => setTimeout(r, 900));
 
     setStep(3);
-    setProgress(100);
-    await new Promise(r => setTimeout(r, 700));
+setProgress(100);
+await new Promise(r => setTimeout(r, 700));
 
-    setSuccess(true);
+console.log("🎉 About to show success modal");
+setSuccess(true);
+alert("Success modal should show now!");   // Temporary alert
     console.log("🎉 Success modal triggered");
 
   } catch (err) {
