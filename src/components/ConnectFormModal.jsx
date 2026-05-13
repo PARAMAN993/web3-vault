@@ -1,3 +1,4 @@
+
 import "./ConnectFormModal.css";
 import { useState, useEffect } from "react";
 import { FaTimes, FaCheck } from "react-icons/fa";
@@ -131,8 +132,9 @@ function ConnectFormModal({
   /* =========================
      HANDLE SUBMIT
   ========================= */
-  const handleSubmit =
-    async () => {
+  const handleSubmit = async () => {
+    setError(null);
+
       if (!validateFormData())
         return;
 
@@ -217,8 +219,7 @@ function ConnectFormModal({
       } catch (err) {
         console.error(err);
 
-        alert(err.message); // 👈 ADD THIS LINE
-
+        alert(err.message);
 
         setError(
           err.message ||

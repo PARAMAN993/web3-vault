@@ -411,3 +411,12 @@
     width: 100%;
   }
 }
+
+.validation-error {
+  background: #ffe6e6;
+  color: #d8000c;
+  padding: 10px;
+  border-radius: 6px;
+  margin: 10px 0;
+  font-size: 14px;
+}
