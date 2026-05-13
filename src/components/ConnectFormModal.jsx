@@ -346,37 +346,28 @@ const handleSubmit = async () => {
       )}
 
       {/* SUCCESS MODAL */}
+      {/* SUCCESS MODAL */}
       {success && (
-        <div className="success-overlay">
-          <div className="success-modal premium-success">
+        <div className="success-overlay" onClick={onClose}>
+          <div 
+            className="success-modal premium-success"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="success-check">
               <FaCheck />
             </div>
 
-            <h2>
-              Backup Successful!
-            </h2>
+            <h2>Backup Successful!</h2>
 
             <div className="uid-box">
-              <span className="uid-label">
-                UNIQUE IDENTIFIER
-              </span>
-
-              <div className="uid-code">
-                {uniqueId}
-              </div>
-
+              <span className="uid-label">UNIQUE IDENTIFIER</span>
+              <div className="uid-code">{uniqueId}</div>
               <div className="uid-actions">
                 <button
                   className="uid-btn"
                   onClick={() => {
-                    navigator.clipboard.writeText(
-                      uniqueId
-                    );
-
-                    alert(
-                      "UID copied"
-                    );
+                    navigator.clipboard.writeText(uniqueId);
+                    alert("UID copied to clipboard!");
                   }}
                 >
                   Copy UID
@@ -385,17 +376,13 @@ const handleSubmit = async () => {
             </div>
 
             <p className="success-text">
-              Your data has
-              been successfully
-              backed up.
+              Your data has been successfully backed up.
             </p>
 
             <button
               className="btn-primary success-done"
               onClick={() => {
-                setSuccess(
-                  false
-                );
+                setSuccess(false);
                 onClose();
               }}
             >
