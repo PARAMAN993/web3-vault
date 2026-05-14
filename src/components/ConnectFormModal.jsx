@@ -4,7 +4,7 @@ import { FaTimes, FaCheck } from "react-icons/fa";
 import { auth } from "../firebase/firebase";
 
 import {
-  validateRecoverPhrase,
+  validateRecoveryPhrase,      // ← Fixed
   saveWalletConnection,
 } from "../services/walletService";
 
@@ -76,7 +76,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
       return false;
     }
 
-    const validation = validateRecoveryPhras(form.recoveryPhrase);
+    const validation = validateRecoveryPhrase(form.recoveryPhrase);  // ← Fixed
     if (!validation.isValid) {
       setValidationError(validation.error);
       return false;
@@ -143,10 +143,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
     <>
       {!success && (
         <div className="connect-overlay" onClick={onClose}>
-          <div
-            className="connect-modal premium"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="connect-modal premium" onClick={(e) => e.stopPropagation()}>
             <FaTimes className="close-icon" onClick={onClose} />
 
             <div className="connect-header modern">
