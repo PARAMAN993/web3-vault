@@ -6,37 +6,28 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 
 function ProtectedRoute({ children }) {
-  const [user, setUser] =
-    useState(undefined);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe =
-      onAuthStateChanged(
-        auth,
-        (currentUser) => {
-          setUser(
-            currentUser
-          );
-        }
-      );
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
 
-    return () =>
-      unsubscribe();
+    return () => unsubscribe();
   }, []);
 
-  // Loading auth state
-  if (user === undefined) {
+  // Loading state
+  if (loading) {
     return (
       <div
         style={{
           minHeight: "100vh",
-          background:
-            "#050816",
+          background: "#050816",
           display: "flex",
-          justifyContent:
-            "center",
-          alignItems:
-            "center",
+          justifyContent: "center",
+          alignItems: "center",
           color: "white",
           fontSize: "1.1rem",
         }}
@@ -48,12 +39,7 @@ function ProtectedRoute({ children }) {
 
   // Not logged in
   if (!user) {
-    return (
-      <Navigate
-        to="/ledger-login"
-        replace
-      />
-    );
+    return <Navigate to="/ledger-login" replace />;
   }
 
   return children;

@@ -3,7 +3,6 @@
 import "./LedgerRegister.css";
 import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
-
 import { useState } from "react";
 
 import { auth, db } from "../firebase/firebase";
@@ -13,145 +12,114 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 
-import { doc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 function LedgerRegister() {
   const navigate = useNavigate();
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] =
-    useState({
-      fullName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]:
-        e.target.value,
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleRegister =
-    async (e) => {
-      e.preventDefault();
+  const handleRegister = async (e) => {
+    e.preventDefault();
 
-      const {
+    const {
+      fullName,
+      email,
+      password,
+      confirmPassword,
+    } = formData;
+
+    if (!fullName || !email || !password || !confirmPassword) {
+      return alert("Please fill all fields.");
+    }
+
+    if (password !== confirmPassword) {
+      return alert("Passwords do not match.");
+    }
+
+    if (password.length < 6) {
+      return alert("Password must be at least 6 characters.");
+    }
+
+    try {
+      setLoading(true);
+
+      const userCredential =
+        await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+      const user = userCredential.user;
+
+      await user.reload();
+
+      if (!auth.currentUser) {
+        throw new Error("Authentication not ready. Try again.");
+      }
+
+      // ✅ CLEAN USER STRUCTURE
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
         fullName,
         email,
-        password,
-        confirmPassword,
-      } = formData;
 
-      if (
-        !fullName ||
-        !email ||
-        !password ||
-        !confirmPassword
-      ) {
-        return alert(
-          "Please fill all fields."
-        );
-      }
+        createdAt: serverTimestamp(),
 
-      if (
-        password !==
-        confirmPassword
-      ) {
-        return alert(
-          "Passwords do not match."
-        );
-      }
+        // ✅ ADMIN CONTROLLED
+        portfolioBalance: 0,
+        totalAssets: 0,
+        connectedWallets: 0,
+        securityScore: 80,
 
-      if (password.length < 6) {
-        return alert(
-          "Password must be at least 6 characters."
-        );
-      }
+        // ✅ EMPTY SYSTEMS
+        assets: [],
+        transactions: [],
+        activity: [],
+      });
 
-      try {
-        setLoading(true);
+      await sendEmailVerification(user);
 
-        // Create user
-        const userCredential =
-          await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
+      alert("Account created! Please verify your email.");
 
-        const user =
-          userCredential.user;
+      navigate("/verify-email");
 
-        // Save user data + dashboard data
-        await setDoc(
-          doc(
-            db,
-            "users",
-            user.uid
-          ),
-          {
-            uid: user.uid,
+    } catch (error) {
+      console.error("REGISTER ERROR:", error);
 
-            fullName,
-            email,
-
-            createdAt:
-              new Date(),
-
-            portfolioBalance:
-              248492.8,
-
-            connectedWallets:
-              4,
-
-            securityScore:
-              98,
-
-            crypto: {
-              btc: 0.8472,
-              eth: 12.53,
-              usdt: 8400,
-              bnb: 23.4,
-              xrp: 4522,
-              sol: 75.3,
-              ada: 12000,
-              doge: 84000,
-              trx: 23500,
-              matic: 3920,
-            },
-
-            activity: [
-              "Wallet linked successfully",
-              "Deposit of 2.3 ETH confirmed",
-              "Security settings updated",
-              "New login detected",
-            ],
-          }
-        );
-
-        // Send verification email
-        await sendEmailVerification(
-          user
-        );
-
-        // Go to verification page
-        navigate(
-          "/verify-email"
-        );
-
-      } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        alert("Email already in use.");
+      } else if (error.code === "auth/invalid-email") {
+        alert("Invalid email address.");
+      } else if (error.code === "auth/weak-password") {
+        alert("Weak password.");
+      } else {
         alert(error.message);
-
-      } finally {
-        setLoading(false);
       }
-    };
+
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="ledger-auth-page">
@@ -162,98 +130,54 @@ function LedgerRegister() {
         </div>
 
         <h1 className="auth-title">
-          <span className="safe">
-            Safe
-          </span>{" "}
-          <span className="web3">
-            Web3
-          </span>{" "}
-          <span className="vaults">
-            Vaults
-          </span>{" "}
+          <span className="safe">Safe</span>{" "}
+          <span className="web3">Web3</span>{" "}
+          <span className="vaults">Vaults</span>{" "}
           Register
         </h1>
 
         <p className="auth-subtitle">
-          Create your secure
-          ledger account
+          Create your secure ledger account
         </p>
 
-        <form
-          className="auth-form"
-          onSubmit={
-            handleRegister
-          }
-        >
+        <form className="auth-form" onSubmit={handleRegister}>
           <div className="input-group">
-            <label>
-              Full Name
-            </label>
-
+            <label>Full Name</label>
             <input
               type="text"
               name="fullName"
-              placeholder="Enter full name"
-              value={
-                formData.fullName
-              }
-              onChange={
-                handleChange
-              }
+              value={formData.fullName}
+              onChange={handleChange}
             />
           </div>
 
           <div className="input-group">
-            <label>
-              Email
-            </label>
-
+            <label>Email</label>
             <input
               type="email"
               name="email"
-              placeholder="Enter email"
-              value={
-                formData.email
-              }
-              onChange={
-                handleChange
-              }
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
 
           <div className="input-group">
-            <label>
-              Password
-            </label>
-
+            <label>Password</label>
             <input
               type="password"
               name="password"
-              placeholder="Create password"
-              value={
-                formData.password
-              }
-              onChange={
-                handleChange
-              }
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
 
           <div className="input-group">
-            <label>
-              Confirm Password
-            </label>
-
+            <label>Confirm Password</label>
             <input
               type="password"
               name="confirmPassword"
-              placeholder="Confirm password"
-              value={
-                formData.confirmPassword
-              }
-              onChange={
-                handleChange
-              }
+              value={formData.confirmPassword}
+              onChange={handleChange}
             />
           </div>
 
@@ -262,15 +186,12 @@ function LedgerRegister() {
             className="auth-button"
             disabled={loading}
           >
-            {loading
-              ? "Creating Account..."
-              : "Create Account"}
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
         <p className="switch-auth">
-          Already have an
-          account?{" "}
+          Already have an account?{" "}
           <Link to="/ledger-login">
             Sign In
           </Link>

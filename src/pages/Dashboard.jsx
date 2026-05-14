@@ -1,12 +1,12 @@
-import PortfolioChart from "../components/PortfolioChart";
-import { usePortfolioHistory } from "../hooks/usePortfolioHistory";
+// src/pages/Dashboard.jsx
+
 import "./Dashboard.css";
 import { auth, db } from "../firebase/firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
 import { doc, onSnapshot } from "firebase/firestore";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 
 import {
   LayoutDashboard,
@@ -29,9 +29,10 @@ function Dashboard() {
   const [crypto, setCrypto] = useState({});
   const [activities, setActivities] = useState([]);
   const [toast, setToast] = useState(null);
+
+  // ✅ LIVE PRICES STATE
   const [prices, setPrices] = useState({});
 
-  // ✅ AUTH + USER SNAPSHOT
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((currentUser) => {
       if (!currentUser) return;
@@ -54,7 +55,7 @@ function Dashboard() {
     return () => unsubscribeAuth();
   }, []);
 
-  // ✅ LIVE PRICES (updates every 60s)
+  // ✅ FETCH LIVE CRYPTO PRICES
   useEffect(() => {
     const fetchPrices = async () => {
       try {
@@ -77,9 +78,6 @@ function Dashboard() {
     };
 
     fetchPrices();
-    const interval = setInterval(fetchPrices, 60000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = async () => {
@@ -87,16 +85,19 @@ function Dashboard() {
     navigate("/ledger-login");
   };
 
-  // ✅ TOTAL BALANCE (optimized)
-  const totalBalance = useMemo(() => {
-    return Object.entries(crypto || {}).reduce((total, [coin, amount]) => {
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 2000);
+  };
+
+  // ✅ REAL PORTFOLIO VALUE (USDT)
+  const totalBalance = Object.entries(crypto || {}).reduce(
+    (total, [coin, amount]) => {
       const price = prices[coin] || 0;
       return total + Number(amount) * price;
-    }, 0);
-  }, [crypto, prices]);
-
-  // ✅ SAVE HISTORY (CRITICAL)
-  usePortfolioHistory(auth.currentUser?.uid, totalBalance);
+    },
+    0
+  );
 
   const stats = [
     {
@@ -124,6 +125,7 @@ function Dashboard() {
     },
   ];
 
+  // ✅ ENHANCED PORTFOLIO DATA
   const portfolio = Object.entries(crypto || {})
     .filter(([_, amount]) => Number(amount) > 0)
     .map(([coin, amount]) => ({
@@ -134,8 +136,10 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
+
       {/* SIDEBAR */}
       <aside className="dashboard-sidebar">
+
         <div>
           <div className="sidebar-logo">
             <h2>
@@ -146,6 +150,7 @@ function Dashboard() {
           </div>
 
           <nav className="sidebar-nav">
+
             <div className="nav-item active">
               <LayoutDashboard size={20} />
               <span>Dashboard</span>
@@ -175,6 +180,7 @@ function Dashboard() {
               <Settings size={20} />
               <span>Settings</span>
             </div>
+
           </nav>
         </div>
 
@@ -182,12 +188,15 @@ function Dashboard() {
           <LogOut size={18} />
           Logout
         </button>
+
       </aside>
 
       {/* MAIN */}
-      <main className="dashboard-main" style={{ padding: "24px" }}>
+      <main className="dashboard-main">
+
         {/* TOPBAR */}
         <header className="dashboard-topbar">
+
           <div>
             <h1 className="welcome-title">
               Welcome Back {userData?.fullName || ""}
@@ -204,6 +213,7 @@ function Dashboard() {
               {userData?.fullName?.charAt(0).toUpperCase()}
             </div>
           </div>
+
         </header>
 
         {/* STATS */}
@@ -219,21 +229,11 @@ function Dashboard() {
           ))}
         </section>
 
-        {/* CHART */}
-        <section style={{ marginTop: "30px" }}>
-          <div className="portfolio-card" style={{ padding: "20px" }}>
-            <div className="section-header">
-              <TrendingUp size={22} />
-              <h2>Portfolio Growth</h2>
-            </div>
-
-            <PortfolioChart uid={auth.currentUser?.uid} />
-          </div>
-        </section>
-
         {/* PORTFOLIO */}
         <section className="dashboard-grid">
+
           <div className="portfolio-card">
+
             <div className="section-header">
               <TrendingUp size={22} />
               <h2>Portfolio Assets</h2>
@@ -243,19 +243,23 @@ function Dashboard() {
               {portfolio.map((coin, i) => (
                 <div className="coin-card" key={i}>
                   <h3>{coin.name}</h3>
+
                   <p>
                     {coin.amount} {coin.name}
                   </p>
+
                   <p style={{ color: "#00d4ff", marginTop: "6px" }}>
                     ${coin.value}
                   </p>
                 </div>
               ))}
             </div>
+
           </div>
 
           {/* ACTIVITY */}
           <div className="activity-card">
+
             <div className="section-header">
               <Activity size={22} />
               <h2>Recent Activity</h2>
@@ -269,11 +273,16 @@ function Dashboard() {
                 </div>
               ))}
             </div>
+
           </div>
+
         </section>
+
       </main>
 
+      {/* TOAST */}
       {toast && <div className="toast">{toast}</div>}
+
     </div>
   );
 }
