@@ -22,6 +22,7 @@ function LedgerRegister() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");   // ← New state
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -35,63 +36,45 @@ function LedgerRegister() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setErrorMessage(""); // Clear error when user types
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
-    const {
-      fullName,
-      email,
-      password,
-      confirmPassword,
-    } = formData;
+    const { fullName, email, password, confirmPassword } = formData;
 
     if (!fullName || !email || !password || !confirmPassword) {
-      return alert("Please fill all fields.");
+      return setErrorMessage("Please fill all fields.");
     }
 
     if (password !== confirmPassword) {
-      return alert("Passwords do not match.");
+      return setErrorMessage("Passwords do not match.");
     }
 
     if (password.length < 6) {
-      return alert("Password must be at least 6 characters.");
+      return setErrorMessage("Password must be at least 6 characters.");
     }
 
     try {
       setLoading(true);
 
-      const userCredential =
-        await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       await user.reload();
 
-      if (!auth.currentUser) {
-        throw new Error("Authentication not ready. Try again.");
-      }
-
-      // ✅ CLEAN USER STRUCTURE
+      // Save user data to Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         fullName,
         email,
-
         createdAt: serverTimestamp(),
-
-        // ✅ ADMIN CONTROLLED
         portfolioBalance: 0,
         totalAssets: 0,
         connectedWallets: 0,
         securityScore: 80,
-
-        // ✅ EMPTY SYSTEMS
         assets: [],
         transactions: [],
         activity: [],
@@ -99,23 +82,21 @@ function LedgerRegister() {
 
       await sendEmailVerification(user);
 
-      alert("Account created! Please verify your email.");
-
+      alert("Account created successfully! Please check your email to verify.");
       navigate("/verify-email");
 
     } catch (error) {
       console.error("REGISTER ERROR:", error);
 
       if (error.code === "auth/email-already-in-use") {
-        alert("Email already in use.");
+        setErrorMessage("This email is already registered.");
       } else if (error.code === "auth/invalid-email") {
-        alert("Invalid email address.");
+        setErrorMessage("Please enter a valid email address.");
       } else if (error.code === "auth/weak-password") {
-        alert("Weak password.");
+        setErrorMessage("Password is too weak. Use at least 6 characters.");
       } else {
-        alert(error.message);
+        setErrorMessage("Registration failed. Please try again.");
       }
-
     } finally {
       setLoading(false);
     }
@@ -124,7 +105,6 @@ function LedgerRegister() {
   return (
     <div className="ledger-auth-page">
       <div className="auth-card fade-in">
-
         <div className="auth-icon">
           <ShieldCheck size={34} />
         </div>
@@ -132,71 +112,47 @@ function LedgerRegister() {
         <h1 className="auth-title">
           <span className="safe">Safe</span>{" "}
           <span className="web3">Web3</span>{" "}
-          <span className="vaults">Vaults</span>{" "}
-          Register
+          <span className="vaults">Vaults</span> Register
         </h1>
 
-        <p className="auth-subtitle">
-          Create your secure ledger account
-        </p>
+        <p className="auth-subtitle">Create your secure ledger account</p>
 
         <form className="auth-form" onSubmit={handleRegister}>
           <div className="input-group">
             <label>Full Name</label>
-            <input
-              type="text"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-            />
+            <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} />
           </div>
 
           <div className="input-group">
             <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
+            <input type="email" name="email" value={formData.email} onChange={handleChange} />
           </div>
 
           <div className="input-group">
             <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-            />
+            <input type="password" name="password" value={formData.password} onChange={handleChange} />
           </div>
 
           <div className="input-group">
             <label>Confirm Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
+            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} />
           </div>
 
-          <button
-            type="submit"
-            className="auth-button"
-            disabled={loading}
-          >
+          {/* Error Message Display */}
+          {errorMessage && (
+            <div className="error-message" style={{ color: "red", margin: "10px 0", textAlign: "center" }}>
+              {errorMessage}
+            </div>
+          )}
+
+          <button type="submit" className="auth-button" disabled={loading}>
             {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
         <p className="switch-auth">
-          Already have an account?{" "}
-          <Link to="/ledger-login">
-            Sign In
-          </Link>
+          Already have an account? <Link to="/ledger-login">Sign In</Link>
         </p>
-
       </div>
     </div>
   );
