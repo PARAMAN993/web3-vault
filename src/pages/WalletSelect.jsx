@@ -26,7 +26,7 @@ import tokenp from "../assets/wallets/tokenp.png";
 import walletc from "../assets/wallets/walletc.png";
 import xamen from "../assets/wallets/xamen.png";
 import maiar from "../assets/wallets/maiar.png";
-import ledgerlive from "../assets/wallets/ledgerlive.png";
+import ledgerlive from "../assets/wallets/ledgerLive.png";
 import eidoo from "../assets/wallets/eidoo.png";
 import mykey from "../assets/wallets/mykey.png";
 import coin98 from "../assets/wallets/coin98.png";
