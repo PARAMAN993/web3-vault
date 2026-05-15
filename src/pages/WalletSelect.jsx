@@ -10,7 +10,7 @@ import safepal from "../assets/wallets/safepal.png";
 import coin from "../assets/wallets/coin.png";
 import exodus from "../assets/wallets/exodus.png";
 import trezor from "../assets/wallets/trezor.png";
-import ledger from "../assets/wallets/ledger.png";
+import ledger from "../assets/wallets/ledgerlive.png";
 import okx from "../assets/wallets/okx.png";
 import phantom from "../assets/wallets/phantom.png";
 import robinhood from "../assets/wallets/robinhood.png";
