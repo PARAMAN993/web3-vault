@@ -128,7 +128,7 @@ function WalletSelect() {
     { name: "Coinomi", image: coinomi},
     { name: "Alpha", image: alpha},
     { name: "Trustvault", image: trustvault},
-    { name: "Loopring", image: loopring},
+    { name: "Loopring Wallet", image: loopring},
     { name: "Huobi", image: huobi},
     { name: "Walleth", image: walleth},
     { name: "Bitpay", image: bitpay},
