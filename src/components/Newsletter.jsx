@@ -80,7 +80,7 @@ function Newsletter() {
         {error && <p className="newsletter-error">{error}</p>}
 
         <p className="newsletter-copy">
-          Copyright © 2026 Safe Web3 Networks
+          Copyright © 2026 Safe Web3 Vault
         </p>
 
       </section>
