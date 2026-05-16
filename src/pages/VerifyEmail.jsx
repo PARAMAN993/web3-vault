@@ -67,8 +67,8 @@ function VerifyEmail() {
         <h1 className="verify-brand">
           <span className="safe">Safe</span>{" "}
           <span className="web3">Web3</span>{" "}
-          <span className="vaults">
-            Vaults
+          <span className="vault">
+            Vault
           </span>
         </h1>
 

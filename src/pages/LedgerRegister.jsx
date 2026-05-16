@@ -112,7 +112,7 @@ function LedgerRegister() {
         <h1 className="auth-title">
           <span className="safe">Safe</span>{" "}
           <span className="web3">Web3</span>{" "}
-          <span className="vaults">Vaults</span> Register
+          <span className="vault">Vault</span> Register
         </h1>
 
         <p className="auth-subtitle">Create your secure ledger account</p>

@@ -105,8 +105,8 @@ function LedgerLogin() {
           <span className="web3">
             Web3
           </span>{" "}
-          <span className="vaults">
-            Vaults
+          <span className="vault">
+            Vault
           </span>{" "}
           Login
         </h1>

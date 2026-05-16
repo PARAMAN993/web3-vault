@@ -145,7 +145,7 @@ function Dashboard() {
             <h2>
               <span className="logo-safe">Safe</span>
               <span className="logo-web3">Web3</span>
-              <span className="logo-vaults">Vaults</span>
+              <span className="logo-vault">Vault</span>
             </h2>
           </div>
 

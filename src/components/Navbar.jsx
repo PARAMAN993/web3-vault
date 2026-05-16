@@ -68,8 +68,8 @@ const Navbar = ({
             Web3
           </span>
 
-          <span className="vaults">
-            Vaults
+          <span className="vault">
+            Vault
           </span>
 
         </div>

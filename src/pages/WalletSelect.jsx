@@ -94,7 +94,7 @@ function WalletSelect() {
     <div className="wallet-page">
       {/* NAVBAR */}
       <div className="wallet-navbar">
-        <span className="logo">SAFE WEB3 VAULTS</span>
+        <span className="logo">SAFE WEB3 VAULT</span>
         <button className="wallet-nav-btn">Secure Wallet</button>
       </div>
 

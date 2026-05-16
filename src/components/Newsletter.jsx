@@ -91,7 +91,7 @@ function Newsletter() {
           <div className="success-box">
             <div className="checkmark">✔</div>
             <h3>Subscribed Successfully</h3>
-            <p>You’ve joined Safe Web3 Vaults</p>
+            <p>You’ve joined Safe Web3 Vault</p>
           </div>
         </div>
       )}
