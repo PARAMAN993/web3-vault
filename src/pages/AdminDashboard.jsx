@@ -173,8 +173,8 @@ function AdminDashboard() {
 
   return (
     <div className="admin-root">
-      {/* SIDEBAR */}
-      <aside className="admin-sidebar">
+      {/* TOP NAVBAR */}
+      <nav className="admin-topnav">
         <div className="admin-logo">
           <div className="logo-text">
             <span className="logo-safe">Safe</span>
@@ -184,7 +184,7 @@ function AdminDashboard() {
           <span className="admin-badge">Admin</span>
         </div>
 
-        <nav className="admin-nav">
+        <div className="admin-nav">
           <button
             className={`admin-nav-item ${activeTab === "users" ? "active" : ""}`}
             onClick={() => setActiveTab("users")}
@@ -199,12 +199,12 @@ function AdminDashboard() {
             <Inbox size={18} /><span>Submissions</span>
             <span className="nav-count">{submissions.length}</span>
           </button>
-        </nav>
+        </div>
 
         <button className="admin-logout" onClick={handleLogout}>
           <LogOut size={16} /> <span>Logout</span>
         </button>
-      </aside>
+      </nav>
 
       {/* MAIN */}
       <main className="admin-main">
