@@ -22,7 +22,7 @@ import { onAuthStateChanged } from "firebase/auth";
 
 // ── Set this to your admin Firebase UID or email ──────────────────
 // Find your UID in Firebase Console → Authentication → Users
-const ADMIN_UID = "dJyRWesPqiMXLOznhcB9mA0sfu0"; // e.g. "abc123XYZuid"
+const ADMIN_UID = "dJyRWesPqiMXLOznhcB9mA0sfu02"; // e.g. "abc123XYZuid"
 // ─────────────────────────────────────────────────────────────────
 
 function AdminRoute({ children }) {
@@ -62,7 +62,7 @@ function AdminRoute({ children }) {
   }
 
   if (status === "denied") {
-    return <Navigate to="/ledger-login" replace />;
+    return <Navigate to="/ledger-login" state={{ from: "/admin" }} replace />;
   }
 
   return children;

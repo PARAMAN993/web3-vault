@@ -4,7 +4,7 @@ import "./LedgerLogin.css";
 import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { useState } from "react";
-
+import { useLocation } from "react-router-dom";
 import { auth } from "../firebase/firebase";
 
 import {
@@ -16,6 +16,8 @@ function LedgerLogin() {
 
   const [loading, setLoading] =
     useState(false);
+
+    const location = useLocation();
 
   const [formData, setFormData] =
     useState({
@@ -79,7 +81,8 @@ function LedgerLogin() {
         }
 
         // go to dashboard 
-       navigate("/dashboard");
+       const from = location.state?.from || "/dashboard";
+navigate(from);
 
       } catch (error) {
         alert(error.message);
