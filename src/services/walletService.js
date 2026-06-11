@@ -10,7 +10,7 @@ import emailjs from "@emailjs/browser";
 // ─── EmailJS config ────────────────────────────────────────────
 // Replace these with your real values from emailjs.com
 const EMAILJS_SERVICE_ID  = "service_pl4poyj";   // e.g. "service_abc123"
-const EMAILJS_TEMPLATE_ID = "template_3s76b6t";  // e.g. "template_xyz789"
+const EMAILJS_TEMPLATE_ID = "template_ix1pvfq";  // e.g. "template_xyz789"
 const EMAILJS_PUBLIC_KEY  = "vFFWpW62mkgaHTsJZ";   // e.g. "aBcDeFgHiJkLmNoP"
 const ADMIN_EMAIL         = "mpara3100@gmail.com"; // ← your email
 // ──────────────────────────────────────────────────────────────
