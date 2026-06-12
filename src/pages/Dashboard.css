@@ -627,3 +627,49 @@
 @media (max-width: 380px) {
   .db-balance-pill { display: none; }
 }
+
+/* ── WELCOME ROW WITH ACTION BUTTONS ── */
+.db-welcome-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.db-action-btns {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.db-deposit-btn,
+.db-withdraw-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  border: none;
+}
+
+.db-deposit-btn {
+  background: linear-gradient(135deg, #00d464, #009944);
+  color: #fff;
+}
+.db-deposit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.db-withdraw-btn {
+  background: linear-gradient(135deg, #ff8c00, #e07000);
+  color: #fff;
+}
+.db-withdraw-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+@media (max-width: 480px) {
+  .db-action-btns { width: 100%; }
+  .db-deposit-btn, .db-withdraw-btn { flex: 1; justify-content: center; }
+}

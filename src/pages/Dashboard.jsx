@@ -9,8 +9,10 @@ import {
   LayoutDashboard, Wallet, Shield, Settings,
   Activity, Bell, LogOut, Briefcase, TrendingUp,
   Landmark, Bitcoin, Menu, X, Save, User, Mail,
-  ChevronRight,
+  ChevronRight, ArrowUpRight, ArrowDownLeft,
 } from "lucide-react";
+import WithdrawModal from "../components/WithdrawModal";
+import DepositModal from "../components/DepositModal";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -23,15 +25,14 @@ function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
 
-  // Settings form state
   const [settingsName, setSettingsName] = useState("");
   const [settingsEmail, setSettingsEmail] = useState("");
   const [settingsSaving, setSettingsSaving] = useState(false);
 
   const bellRef = useRef(null);
-
-  // Refs for scroll targets
   const portfolioRef = useRef(null);
   const walletsRef = useRef(null);
   const activityRef = useRef(null);
@@ -56,12 +57,9 @@ function Dashboard() {
     return () => unsubscribeAuth();
   }, []);
 
-  // Close bell when clicking outside
   useEffect(() => {
     const handler = (e) => {
-      if (bellRef.current && !bellRef.current.contains(e.target)) {
-        setBellOpen(false);
-      }
+      if (bellRef.current && !bellRef.current.contains(e.target)) setBellOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -100,29 +98,17 @@ function Dashboard() {
 
   const scrollTo = (ref) => {
     setMenuOpen(false);
-    setTimeout(() => {
-      ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 150);
+    setTimeout(() => ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 150);
   };
 
-  const openSettings = () => {
-    setMenuOpen(false);
-    setSettingsOpen(true);
-  };
+  const openSettings = () => { setMenuOpen(false); setSettingsOpen(true); };
 
   const saveSettings = async () => {
-    if (!settingsName.trim()) {
-      showToast("Name cannot be empty", "error");
-      return;
-    }
+    if (!settingsName.trim()) { showToast("Name cannot be empty", "error"); return; }
     setSettingsSaving(true);
     try {
       const currentUser = auth.currentUser;
-      // Update Firestore
-      await updateDoc(doc(db, "users", currentUser.uid), {
-        fullName: settingsName.trim(),
-      });
-      // Update Firebase Auth display name
+      await updateDoc(doc(db, "users", currentUser.uid), { fullName: settingsName.trim() });
       await updateProfile(currentUser, { displayName: settingsName.trim() });
       showToast("Settings saved");
       setSettingsOpen(false);
@@ -143,6 +129,7 @@ function Dashboard() {
       name: coin.toUpperCase(),
       amount: Number(amount),
       value: (Number(amount) * (prices[coin] || 0)).toFixed(2),
+      usdValue: Number(amount) * (prices[coin] || 0),
     }));
 
   const navLinks = [
@@ -163,7 +150,7 @@ function Dashboard() {
   return (
     <div className="db-root">
 
-      {/* ── HEADER ── */}
+      {/* HEADER */}
       <header className="db-header">
         <div className="db-header-left">
           <div className="db-logo">
@@ -180,13 +167,11 @@ function Dashboard() {
         </div>
 
         <div className="db-header-right">
-          {/* Bell */}
           <div className="db-bell-wrap" ref={bellRef}>
             <button className="db-icon-btn" onClick={() => setBellOpen(!bellOpen)}>
               <Bell size={19} />
               {activities.length > 0 && <span className="bell-dot" />}
             </button>
-
             {bellOpen && (
               <div className="db-bell-dropdown">
                 <div className="bell-header">
@@ -194,9 +179,7 @@ function Dashboard() {
                   <span className="bell-count">{activities.length}</span>
                 </div>
                 <div className="bell-list">
-                  {activities.length === 0 && (
-                    <p className="bell-empty">No recent activity.</p>
-                  )}
+                  {activities.length === 0 && <p className="bell-empty">No recent activity.</p>}
                   {activities.slice(0, 6).map((item, i) => (
                     <div className="bell-item" key={i}>
                       <div className="bell-dot-sm" />
@@ -208,21 +191,17 @@ function Dashboard() {
             )}
           </div>
 
-          <div className="db-avatar">
-            {userData?.fullName?.charAt(0).toUpperCase()}
-          </div>
+          <div className="db-avatar">{userData?.fullName?.charAt(0).toUpperCase()}</div>
           <button className="db-hamburger" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </header>
 
-      {/* ── SLIDE-IN MENU ── */}
+      {/* SLIDE-IN MENU */}
       <div className={`db-menu ${menuOpen ? "open" : ""}`}>
         <div className="db-menu-user">
-          <div className="db-avatar db-avatar-lg">
-            {userData?.fullName?.charAt(0).toUpperCase()}
-          </div>
+          <div className="db-avatar db-avatar-lg">{userData?.fullName?.charAt(0).toUpperCase()}</div>
           <div>
             <p className="db-menu-name">{userData?.fullName || ""}</p>
             <p className="db-menu-email">{userData?.email}</p>
@@ -246,42 +225,24 @@ function Dashboard() {
         <div className="db-overlay" onClick={() => { setMenuOpen(false); setSettingsOpen(false); }} />
       )}
 
-      {/* ── SETTINGS PANEL ── */}
+      {/* SETTINGS PANEL */}
       <div className={`db-settings-panel ${settingsOpen ? "open" : ""}`}>
         <div className="settings-header">
           <h2>Settings</h2>
-          <button className="settings-close" onClick={() => setSettingsOpen(false)}>
-            <X size={20} />
-          </button>
+          <button className="settings-close" onClick={() => setSettingsOpen(false)}><X size={20} /></button>
         </div>
-
         <div className="settings-body">
           <p className="settings-subtitle">Update your profile information below.</p>
-
           <div className="settings-field">
             <label><User size={14} /> Display Name</label>
-            <input
-              type="text"
-              value={settingsName}
-              onChange={(e) => setSettingsName(e.target.value)}
-              placeholder="Your full name"
-            />
+            <input type="text" value={settingsName} onChange={(e) => setSettingsName(e.target.value)} placeholder="Your full name" />
           </div>
-
           <div className="settings-field">
             <label><Mail size={14} /> Email Address</label>
-            <input
-              type="email"
-              value={settingsEmail}
-              disabled
-              placeholder="Email"
-              className="input-disabled"
-            />
+            <input type="email" value={settingsEmail} disabled className="input-disabled" />
             <p className="field-hint">Email cannot be changed here. Contact support.</p>
           </div>
-
           <div className="settings-divider" />
-
           <div className="settings-info-row">
             <div className="settings-info-item">
               <span className="info-label">Security Score</span>
@@ -296,25 +257,32 @@ function Dashboard() {
               <span className="info-val">{Object.keys(crypto || {}).length}</span>
             </div>
           </div>
-
-          <button
-            className="settings-save-btn"
-            onClick={saveSettings}
-            disabled={settingsSaving}
-          >
+          <button className="settings-save-btn" onClick={saveSettings} disabled={settingsSaving}>
             <Save size={16} />
             {settingsSaving ? "Saving…" : "Save Changes"}
           </button>
         </div>
       </div>
 
-      {/* ── MAIN ── */}
+      {/* MAIN */}
       <main className="db-main">
 
-        {/* Welcome */}
-        <div className="db-welcome">
-          <h1 className="db-welcome-title">Welcome back, {userData?.fullName?.split(" ")[0] || ""}</h1>
-          <p className="db-welcome-sub">{userData?.email}</p>
+        {/* Welcome + action buttons */}
+        <div className="db-welcome-row">
+          <div>
+            <h1 className="db-welcome-title">Welcome back, {userData?.fullName?.split(" ")[0] || ""}</h1>
+            <p className="db-welcome-sub">{userData?.email}</p>
+          </div>
+          <div className="db-action-btns">
+            <button className="db-deposit-btn" onClick={() => setDepositOpen(true)}>
+              <ArrowDownLeft size={17} />
+              Deposit
+            </button>
+            <button className="db-withdraw-btn" onClick={() => setWithdrawOpen(true)}>
+              <ArrowUpRight size={17} />
+              Withdraw
+            </button>
+          </div>
         </div>
 
         {/* STATS */}
@@ -337,7 +305,7 @@ function Dashboard() {
 
         {/* PORTFOLIO */}
         <div className="db-section-anchor" ref={portfolioRef} />
-        <div className="db-card" id="portfolio">
+        <div className="db-card">
           <div className="db-card-header">
             <TrendingUp size={20} />
             <h2>Portfolio Assets</h2>
@@ -357,10 +325,9 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* WALLETS + ACTIVITY side by side */}
+        {/* WALLETS + ACTIVITY */}
         <div className="db-two-col">
-
-          <div className="db-card" id="wallets">
+          <div className="db-card">
             <div className="db-section-anchor" ref={walletsRef} />
             <div className="db-card-header">
               <Wallet size={20} />
@@ -384,7 +351,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="db-card" id="activity">
+          <div className="db-card">
             <div className="db-section-anchor" ref={activityRef} />
             <div className="db-card-header">
               <Activity size={20} />
@@ -400,12 +367,11 @@ function Dashboard() {
               ))}
             </div>
           </div>
-
         </div>
 
         {/* SECURITY */}
         <div className="db-section-anchor" ref={securityRef} />
-        <div className="db-card" id="security">
+        <div className="db-card">
           <div className="db-card-header">
             <Shield size={20} />
             <h2>Security</h2>
@@ -422,6 +388,17 @@ function Dashboard() {
         </div>
 
       </main>
+
+      {/* MODALS */}
+      <WithdrawModal
+        isOpen={withdrawOpen}
+        onClose={() => setWithdrawOpen(false)}
+        portfolio={portfolio}
+      />
+      <DepositModal
+        isOpen={depositOpen}
+        onClose={() => setDepositOpen(false)}
+      />
 
       {toast && <div className={`db-toast ${toast.type}`}>{toast.msg}</div>}
     </div>
