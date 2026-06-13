@@ -53,6 +53,11 @@ if (!user.emailVerified && !ADMIN_UIDS.includes(user.uid)) {
 
 // if admin → go to /admin, otherwise go to intended page or dashboard
 if (ADMIN_UIDS.includes(user.uid)) {
+  console.log("UID:", user.uid);
+console.log("Email verified:", user.emailVerified);
+console.log("Is admin:", ADMIN_UIDS.includes(user.uid));
+console.log("ADMIN_UIDS:", ADMIN_UIDS);
+
   navigate("/admin");
 } else {
   const from = location.state?.from || "/dashboard";
