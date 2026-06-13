@@ -45,18 +45,19 @@ function LedgerLogin() {
       
 
       // check verification
-      if (!user.emailVerified) {
-        navigate("/verify-email");
-        return alert("Please verify your email first.");
-      }
+      // check verification (skip for admins)
+if (!user.emailVerified && !ADMIN_UIDS.includes(user.uid)) {
+  navigate("/verify-email");
+  return alert("Please verify your email first.");
+}
 
-      // if admin → go to /admin, otherwise go to intended page or dashboard
-      if (ADMIN_UIDS.includes(user.uid)) {
-        navigate("/admin");
-      } else {
-        const from = location.state?.from || "/dashboard";
-        navigate(from);
-      }
+// if admin → go to /admin, otherwise go to intended page or dashboard
+if (ADMIN_UIDS.includes(user.uid)) {
+  navigate("/admin");
+} else {
+  const from = location.state?.from || "/dashboard";
+  navigate(from);
+}
 
     } catch (error) {
       alert(error.message);
