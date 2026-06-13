@@ -1,7 +1,7 @@
 // src/components/AdminRoute.jsx
 //
-// Protects the admin dashboard. Only the user whose UID (or email)
-// matches ADMIN_UID can access it. Everyone else is redirected away.
+// Protects the admin dashboard. Only users whose UID is in the
+// ADMIN_UIDS array can access it. Everyone else is redirected away.
 //
 // HOW TO USE in your router (e.g. App.jsx):
 //
@@ -19,10 +19,12 @@ import { Navigate } from "react-router-dom";
 import { auth } from "../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
-
-// ── Set this to your admin Firebase UID or email ──────────────────
-// Find your UID in Firebase Console → Authentication → Users
-const ADMIN_UID = "dJyRWesPqiMXLOznhcB9mA0sfu02"; // e.g. "abc123XYZuid"
+// ── Add any admin Firebase UIDs here ─────────────────────────────
+// Find UIDs in Firebase Console → Authentication → Users
+const ADMIN_UIDS = [
+  "k6092ZfyXdQ6h5wqzpBln5FCkdp2", // original admin
+  "LV90chzW7VPvy9utAHzbTO0l4Yx1", // second admin (you)
+];
 // ─────────────────────────────────────────────────────────────────
 
 function AdminRoute({ children }) {
@@ -30,15 +32,13 @@ function AdminRoute({ children }) {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      console.log("Current UID:", user?.uid);
-      console.log("Admin UID:", ADMIN_UID);
       if (!user) {
         setStatus("denied");
-       } else if (user.uid === ADMIN_UID) {
-  setStatus("allowed");
-} else {
-  setStatus("denied");
-}
+      } else if (ADMIN_UIDS.includes(user.uid)) {
+        setStatus("allowed");
+      } else {
+        setStatus("denied");
+      }
     });
     return unsub;
   }, []);

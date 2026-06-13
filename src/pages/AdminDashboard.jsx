@@ -13,7 +13,9 @@ import {
   Activity, Eye, EyeOff,
 } from "lucide-react";
 
-const DEFAULT_COINS = ["BTC", "ETH", "SOL", "BNB", "XRP"];
+// ── All supported coins ───────────────────────────────────────────
+const DEFAULT_COINS = ["BTC", "ETH", "SOL", "BNB", "XRP", "USDT", "XLM", "ADA", "DOGE"];
+// ─────────────────────────────────────────────────────────────────
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -88,7 +90,6 @@ function AdminDashboard() {
       [uid]: { ...prev[uid], crypto: { ...prev[uid].crypto, [coin]: value } },
     }));
 
-  // Add a brand new custom coin
   const addCoin = (uid) => {
     const name = editState[uid]?.newCoinName?.trim().toUpperCase();
     const amount = editState[uid]?.newCoinAmount?.trim();
@@ -109,7 +110,6 @@ function AdminDashboard() {
     }));
   };
 
-  // Remove a coin entirely
   const removeCoin = (uid, coin) => {
     setEditState((prev) => {
       const newCrypto = { ...prev[uid].crypto };
@@ -283,7 +283,7 @@ function AdminDashboard() {
                         <div className="add-coin-row">
                           <input
                             type="text"
-                            placeholder="Coin (e.g. DOGE)"
+                            placeholder="Coin (e.g. MATIC)"
                             value={ed.newCoinName || ""}
                             onChange={(e) => updateField(user.id, "newCoinName", e.target.value)}
                             className="add-coin-name"

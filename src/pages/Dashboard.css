@@ -480,33 +480,75 @@
 /* Two col */
 .db-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-/* Wallets */
+/* ── WALLETS ── */
 .db-wallets-list { display: flex; flex-direction: column; gap: 10px; }
 
 .db-wallet-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 14px;
-  padding: 14px;
+  padding: 12px 14px;
+  transition: border-color 0.15s;
 }
+.db-wallet-row:hover { border-color: rgba(0,212,255,0.15); }
+
 .db-wallet-icon {
-  width: 36px;
+  width: 42px;
   height: 36px;
-  min-width: 36px;
+  min-width: 42px;
   border-radius: 10px;
   background: rgba(124,92,252,0.12);
+  border: 1px solid rgba(124,92,252,0.18);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #7c5cfc;
 }
+
+.db-wallet-coin-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #a78bfa;
+  text-transform: uppercase;
+}
+
+.db-wallet-addr-block {
+  flex: 1;
+  min-width: 0;
+}
+
 .db-wallet-name { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 2px; }
-.db-wallet-addr { font-size: 12px; color: #3a4a5e; font-family: monospace; }
+.db-wallet-addr {
+  font-size: 11px;
+  color: #3a4a5e;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.db-copy-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 7px;
+  color: #5a6a7e;
+  cursor: pointer;
+  padding: 5px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.db-copy-btn:hover { border-color: rgba(0,212,255,0.35); color: #00d4ff; }
+.db-copy-btn.copied { border-color: rgba(34,197,94,0.4); color: #22c55e; }
+
 .db-wallet-badge {
-  margin-left: auto;
+  flex-shrink: 0;
   font-size: 11px;
   font-weight: 700;
   color: #00d4ff;
@@ -622,6 +664,8 @@
   .db-settings-panel { width: 100%; }
 
   .db-bell-dropdown { width: 260px; right: -50px; }
+
+  .db-wallet-badge { display: none; }
 }
 
 @media (max-width: 380px) {
