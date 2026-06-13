@@ -42,7 +42,7 @@ function LedgerLogin() {
 
       // refresh user state
       await user.reload();
-      console.log("Logged in UID:", user.uid);
+      
 
       // check verification
       if (!user.emailVerified) {
