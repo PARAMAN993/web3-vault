@@ -5,7 +5,7 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null && (
         request.auth.uid == "k6092ZfyXdQ6h5wqzpBln5FCkdp2" ||
-        request.auth.uid == "LV90chzW7VPvy9utAHzbTO0l4Yx1"
+        request.auth.uid == "dJyRWesPqiMXLOznhcB9mA0sfu02"
       );
     }
 

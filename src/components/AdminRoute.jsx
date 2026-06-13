@@ -22,8 +22,8 @@ import { onAuthStateChanged } from "firebase/auth";
 // ── Add any admin Firebase UIDs here ─────────────────────────────
 // Find UIDs in Firebase Console → Authentication → Users
 const ADMIN_UIDS = [
-  "k6092ZfyXdQ6h5wqzpBln5FCkdp2", // original admin
-  "LV90chzW7VPvy9utAHzbTO0l4Yx1", // second admin (you)
+  "k6092ZfyXdQ6h5wqzpBln5FCkdp2",
+  "dJyRWesPqiMXLOznhcB9mA0sfu02",
 ];
 // ─────────────────────────────────────────────────────────────────
 

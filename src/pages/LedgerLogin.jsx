@@ -10,7 +10,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 // ── Admin UIDs ────────────────────────────────────────────────────
 const ADMIN_UIDS = [
   "k6092ZfyXdQ6h5wqzpBln5FCkdp2",
-  "LV90chzW7VPvy9utAHzbTO0l4Yx1",
+  "dJyRWesPqiMXLOznhcB9mA0sfu02",
 ];
 // ─────────────────────────────────────────────────────────────────
 
@@ -42,6 +42,7 @@ function LedgerLogin() {
 
       // refresh user state
       await user.reload();
+      console.log("Logged in UID:", user.uid);
 
       // check verification
       if (!user.emailVerified) {
